@@ -1,13 +1,8 @@
 package com.markndevon.cardgames.message;
 
-import com.hearts.message.json.JSONConversions;
-import com.hearts.play.Card;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import com.markndevon.cardgames.model.Card;
 
 import java.util.List;
-
-import static com.hearts.message.json.JSONConstants.CARD_ARRAY_KEY;
 
 public class DealMessage extends Message {
 
@@ -26,11 +21,4 @@ public class DealMessage extends Message {
         return MessageType.DealMessage;
     }
 
-    @Override
-    public String toJSONString(final JSONObject jsonObject) {
-        final JSONArray cardArray = new JSONArray();
-        cards.forEach(card -> cardArray.add(JSONConversions.encodeCard(card)));
-        jsonObject.put(CARD_ARRAY_KEY, cardArray);
-        return jsonObject.toJSONString();
-    }
 }

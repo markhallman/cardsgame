@@ -1,8 +1,5 @@
 package com.markndevon.cardgames.message;
 
-import com.hearts.message.json.JSONConstants;
-import org.json.simple.JSONObject;
-
 public class ShowPassCardsDialogMessage extends Message {
 
     private final String receiver;
@@ -31,10 +28,4 @@ public class ShowPassCardsDialogMessage extends Message {
         return MessageType.ShowPassCardsDialogMessage;
     }
 
-    @Override
-    public String toJSONString(final JSONObject jsonObject) {
-        jsonObject.put(JSONConstants.PLAYER, receiver);
-        jsonObject.put(JSONConstants.CARD_ARRAY_KEY, numCards);
-        return jsonObject.toString();
-    }
 }
