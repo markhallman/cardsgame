@@ -1,5 +1,6 @@
 package com.markndevon.cardgames.controller;
 
+import com.markndevon.cardgames.model.config.RulesConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,11 +34,11 @@ public class GamesAPIController {
      */
     //TODO: A PLAYER name and/or ID should be passed along too
     @PostMapping("/games/creategame/{gameType}")
-    public int createGame(String gameType){
+    public int createGame(String gameType, RulesConfig rulesConfig){
         int gameID = GAME_ID_CREATOR.incrementAndGet();
 
         if (gameType.equalsIgnoreCase("HEARTS")){
-            HEARTS_CONTROLLER.createGame(GAME_ID_CREATOR.incrementAndGet());
+            HEARTS_CONTROLLER.createGame(GAME_ID_CREATOR.incrementAndGet(), rulesConfig);
         } else {
             throw new IllegalArgumentException("Game Type " + gameType + " currently not supported");
         }

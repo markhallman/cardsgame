@@ -1,7 +1,10 @@
 package com.markndevon.cardgames.controller;
 
+import com.markndevon.cardgames.message.GameStartMessage;
 import com.markndevon.cardgames.message.PlayCardMessage;
 import com.markndevon.cardgames.message.PlayerJoinedMessage;
+import com.markndevon.cardgames.message.StartGameRequest;
+import com.markndevon.cardgames.model.config.RulesConfig;
 import org.springframework.stereotype.Controller;
 
 /*
@@ -9,9 +12,8 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 public abstract class GameController {
-    public abstract void createGame(int gameId);
+    public abstract StartGameRequest createGame(int gameId, RulesConfig rulesConfig);
     public abstract PlayerJoinedMessage joinGame(PlayerJoinedMessage playerJoined, int gameId);
-    public abstract void startGame();
     public abstract PlayCardMessage playCard(int roomId, PlayCardMessage cardMessage);
 
 }

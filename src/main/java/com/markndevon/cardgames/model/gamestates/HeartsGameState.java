@@ -41,6 +41,10 @@ public class HeartsGameState extends GameState {
 
     }
 
+    public void start(){
+
+    }
+
     //region getters
     public Player[] getPlayers() {
         return players;
@@ -60,6 +64,10 @@ public class HeartsGameState extends GameState {
 
     public List<Card> getCurrentTrick() {
         return currentTrick;
+    }
+
+    public Map<Player.PlayerDescriptor, Card> getCurrentTrickMap() {
+        return currentTrickMap;
     }
 
     public int getCurrentPlayerID() {
@@ -159,7 +167,7 @@ public class HeartsGameState extends GameState {
         return true;
     }
 
-    private List<Card> getLegalPlays(Player player){
+    public List<Card> getLegalPlays(Player player){
         List<Card> cards = new ArrayList<>();
         for (Card card : player.getHand()){
             if(isLegal(player, card)){
@@ -275,7 +283,7 @@ public class HeartsGameState extends GameState {
         }
     }
 
-    private void reset() {
+    public void reset() {
         Arrays.stream(players).forEach(Player::clearTricksWon);
         heartsBroken = false;
         tricksPlayed = 0;
@@ -285,8 +293,6 @@ public class HeartsGameState extends GameState {
         dealNewHand();
         passCountDown.set(players.length);
         logger.log("Hand reset, resolving.");
-        // TODO: Need to get info back to client
-        //broadcastNewDeal();
         possiblyPassCards();
     }
 

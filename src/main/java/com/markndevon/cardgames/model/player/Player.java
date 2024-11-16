@@ -41,6 +41,10 @@ public abstract class Player {
     public List<Card> getHand() {
         return hand;
     }
+
+    public boolean isHumanControlled(){
+        return isHumanControlled;
+    }
     public void removeCard(final Card card) {
         hand.remove(card);
         logger.log("Player.removeCard: " + toDetailedString());

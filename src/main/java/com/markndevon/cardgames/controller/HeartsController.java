@@ -1,10 +1,10 @@
 package com.markndevon.cardgames.controller;
 
 import com.markndevon.cardgames.logger.Logger;
-import com.markndevon.cardgames.message.PassCardsMessage;
-import com.markndevon.cardgames.message.PlayCardMessage;
-import com.markndevon.cardgames.message.PlayerJoinedMessage;
+import com.markndevon.cardgames.message.*;
 import com.markndevon.cardgames.model.Card;
+import com.markndevon.cardgames.model.config.HeartsRulesConfig;
+import com.markndevon.cardgames.model.config.RulesConfig;
 import com.markndevon.cardgames.service.HeartsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -32,9 +32,10 @@ public class HeartsController extends GameController {
     @Override
     @MessageMapping("/hearts/createGame")
     @SendTo("/topic/hearts/game-room")
-    public void createGame(int gameId) {
+    public StartGameRequest createGame(int gameId, RulesConfig heartsRulesConfig) {
         logger.log("Creating game with ID " + gameId);
-        heartsGameRooms.put(gameId, new HeartsService(gameId));
+        heartsGameRooms.put(gameId, new HeartsService(gameId, (HeartsRulesConfig) heartsRulesConfig));
+        return new StartGameRequest(heartsRulesConfig);
     }
 
     @Override
@@ -50,7 +51,10 @@ public class HeartsController extends GameController {
     public PlayCardMessage playCard(
             @DestinationVariable int gameId,
             @Payload PlayCardMessage cardMessage){
-        // TODO: Error handling?
+        if (!heartsGameRooms.containsKey(gameId)){
+            throw new IllegalArgumentException("Invalid Game ID");
+        }
+
         heartsGameRooms.get(gameId).playCard(cardMessage);
         return cardMessage;
     }
@@ -65,10 +69,11 @@ public class HeartsController extends GameController {
         return cardMessage;
     }
 
-    @MessageMapping("/hearts/startGame")
-    @SendTo("/topic/hearts")
-    public void startGame(){
-
+    @MessageMapping("/hearts/{gameId}/chat")
+    @SendTo("/topic/hearts/game-room/{gameId}/chat")
+    public ChatMessage chatMessage(
+            @DestinationVariable int gameId,
+            @Payload ChatMessage chatMessage) {
+        return chatMessage;
     }
-
 }
