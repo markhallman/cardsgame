@@ -59,6 +59,7 @@ public class HeartsController extends GameController {
         return cardMessage;
     }
 
+    /*
     @MessageMapping("/hearts/{gameId}/passCards")
     @SendTo("/topic/hearts/game-room/{gameId}/passCards")
     public PassCardsMessage passCards(
@@ -68,6 +69,8 @@ public class HeartsController extends GameController {
         heartsGameRooms.get(gameId).passCards(cardMessage);
         return cardMessage;
     }
+    */
+
 
     @MessageMapping("/hearts/{gameId}/chat")
     @SendTo("/topic/hearts/game-room/{gameId}/chat")

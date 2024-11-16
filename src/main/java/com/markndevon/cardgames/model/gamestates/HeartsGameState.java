@@ -42,7 +42,8 @@ public class HeartsGameState extends GameState {
     }
 
     public void start(){
-
+        //passCountDown = new AtomicInteger(players.length);
+        //possiblyPassCards();
     }
 
     //region getters
@@ -224,7 +225,7 @@ public class HeartsGameState extends GameState {
             // TODO: Need to communicate back to client
         }
     }
-
+/*
     private void possiblyPassCards() {
         final PassDeterminer.PassingRule passingRule = passDeterminer.getPassingRule(handCount);
         final PassDeterminer.PassingRule.PassDirection passDirection = passingRule.getPassDirection();
@@ -243,7 +244,7 @@ public class HeartsGameState extends GameState {
                     playerReceiving = players[idx];
                 }
 
-                // TODO: Need to broadcast pass info back to client
+
             }
         }
     }
@@ -282,7 +283,7 @@ public class HeartsGameState extends GameState {
             }
         }
     }
-
+*/
     public void reset() {
         Arrays.stream(players).forEach(Player::clearTricksWon);
         heartsBroken = false;
@@ -293,7 +294,7 @@ public class HeartsGameState extends GameState {
         dealNewHand();
         passCountDown.set(players.length);
         logger.log("Hand reset, resolving.");
-        possiblyPassCards();
+        //possiblyPassCards();
     }
 
     // Assumes cards in order
