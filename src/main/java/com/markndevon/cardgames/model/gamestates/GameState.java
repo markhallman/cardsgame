@@ -25,6 +25,7 @@ public abstract class GameState {
         this.rulesConfig = rulesConfig;
         this.logger = logger;
         if(players.length < 2 || players.length > 52) {
+            // TODO: may differ per game?
             throw new IllegalArgumentException("Can not create a game with less than 2 players or more than 52 players");
         }
 

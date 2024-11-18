@@ -2,19 +2,24 @@ package com.markndevon.cardgames.service;
 
 import com.markndevon.cardgames.logger.Logger;
 import com.markndevon.cardgames.message.*;
-import com.markndevon.cardgames.model.Card;
 import com.markndevon.cardgames.model.config.HeartsRulesConfig;
 import com.markndevon.cardgames.model.gamestates.HeartsGameState;
 import com.markndevon.cardgames.model.player.HumanPlayer;
 import com.markndevon.cardgames.model.player.Player;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Service;
 
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.ArrayList;
+import java.util.List;
 
+@Service
+@Scope("prototype")
 public class HeartsService extends GameService {
-    HeartsGameState heartsGame;
+    private boolean gameIsStarted = false;
+    private final List<Player> players = new ArrayList<>();
+    private HeartsGameState heartsGame;
     @Autowired
     SimpMessagingTemplate clientMessenger;
 
@@ -29,8 +34,13 @@ public class HeartsService extends GameService {
         startGame();
     }
     public void playCard(PlayCardMessage playCard){
-        heartsGame.playCard(new HumanPlayer(playCard.getPlayerDescriptor()), playCard.getCard());
-        updateClients();
+        if(gameIsStarted){
+            heartsGame.playCard(new HumanPlayer(playCard.getPlayerDescriptor()), playCard.getCard());
+            updateClients();
+        } else {
+            // TODO: error handling
+        }
+
     }
 
 /*
@@ -52,8 +62,8 @@ public class HeartsService extends GameService {
                 // TODO: I seriously doubt the player name is how spring will be storing this, need to figure that out
                 // TODO: Repeated code seciton with updateClients
 
-                clientMessenger.convertAndSendToUser(player.getName(), "/topic/hearts/", dealMessage);
-                clientMessenger.convertAndSendToUser(player.getName(), "/topic/hearts/", legalPlaysMessage);
+                clientMessenger.convertAndSendToUser(player.getName(), "/topic/hearts/" + gameId, dealMessage);
+                clientMessenger.convertAndSendToUser(player.getName(), "/topic/hearts/" + gameId, legalPlaysMessage);
             }
         }
 
@@ -72,7 +82,7 @@ public class HeartsService extends GameService {
             if(player.isHumanControlled()){
                 UpdateLegalPlaysMessage legalPlaysMessage = new UpdateLegalPlaysMessage(heartsGame.getLegalPlays(player));
                 // TODO: I seriously doubt the player name is how spring will be storing this, need to figure that out
-                clientMessenger.convertAndSendToUser(player.getName(), "/topic/hearts/", legalPlaysMessage);
+                clientMessenger.convertAndSendToUser(player.getName(), "/topic/hearts/" + gameId, legalPlaysMessage);
             }
         }
     }

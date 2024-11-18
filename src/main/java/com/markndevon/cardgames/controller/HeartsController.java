@@ -12,6 +12,8 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +24,7 @@ import java.util.Map;
 @Controller
 public class HeartsController extends GameController {
 
+    //TODO: Make sure game removals are handled correctly
     private Map<Integer, HeartsService> heartsGameRooms = new HashMap<>();
     @Autowired
     private Logger logger;
