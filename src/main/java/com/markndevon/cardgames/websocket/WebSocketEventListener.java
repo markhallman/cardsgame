@@ -1,4 +1,4 @@
-package com.markndevon.cardgames.websocket.config;
+package com.markndevon.cardgames.websocket;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;

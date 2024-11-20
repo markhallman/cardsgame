@@ -62,8 +62,8 @@ public class HeartsService extends GameService {
                 // TODO: I seriously doubt the player name is how spring will be storing this, need to figure that out
                 // TODO: Repeated code seciton with updateClients
 
-                clientMessenger.convertAndSendToUser(player.getName(), "/topic/hearts/" + gameId, dealMessage);
-                clientMessenger.convertAndSendToUser(player.getName(), "/topic/hearts/" + gameId, legalPlaysMessage);
+                clientMessenger.convertAndSendToUser(player.getName(), "/hearts/game-room/" + gameId + "/deal", dealMessage);
+                clientMessenger.convertAndSendToUser(player.getName(), "/hearts/game-room/" + gameId + "/legalPlays", legalPlaysMessage);
             }
         }
 
@@ -73,17 +73,17 @@ public class HeartsService extends GameService {
     @Override
     public void updateClients(){
         UpdateCurrentTrickMessage currentTrickMessage = new UpdateCurrentTrickMessage(heartsGame.getCurrentTrickMap());
-        clientMessenger.convertAndSend("/topic/hearts/" + gameId, currentTrickMessage);
+        clientMessenger.convertAndSend("/hearts/game-room/" + gameId + "/currentTrick", currentTrickMessage);
 
         UpdateScoreBoardMessage scoreBoardMessage = new UpdateScoreBoardMessage(heartsGame.getScoreBoard().getScore());
-        clientMessenger.convertAndSend("/topic/hearts/" + gameId, scoreBoardMessage);
+        clientMessenger.convertAndSend("/hearts/game-room/" + gameId + "/updateScore", scoreBoardMessage);
 
         // Send the legal plays individually to each player
         for(Player player : heartsGame.getPlayers()) {
             if(player.isHumanControlled()){
                 UpdateLegalPlaysMessage legalPlaysMessage = new UpdateLegalPlaysMessage(heartsGame.getLegalPlays(player));
                 // TODO: I seriously doubt the player name is how spring will be storing this, need to figure that out
-                clientMessenger.convertAndSendToUser(player.getName(), "/topic/hearts/" + gameId, legalPlaysMessage);
+                clientMessenger.convertAndSendToUser(player.getName(), "/hearts/game-room" + gameId + "/legalPlays", legalPlaysMessage);
             }
         }
     }

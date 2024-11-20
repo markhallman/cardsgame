@@ -5,7 +5,9 @@ import com.markndevon.cardgames.message.*;
 import com.markndevon.cardgames.model.Card;
 import com.markndevon.cardgames.model.config.HeartsRulesConfig;
 import com.markndevon.cardgames.model.config.RulesConfig;
+import com.markndevon.cardgames.model.player.HumanPlayer;
 import com.markndevon.cardgames.model.player.Player;
+import com.markndevon.cardgames.service.GameService;
 import com.markndevon.cardgames.service.HeartsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /*
@@ -27,8 +30,8 @@ import java.util.stream.Collectors;
 @Controller
 public class HeartsController extends GameController {
 
-    //TODO: Make sure game removals are handled correctly
-    private Map<Integer, HeartsService> heartsGameRooms = new HashMap<>();
+    //TODO: Make sure game removals are handled correctly. Scheduled task to remove inactive games?
+    private Map<Integer, HeartsService> heartsGameRooms = new ConcurrentHashMap<>();
     @Autowired
     private Logger logger;
 
@@ -45,11 +48,11 @@ public class HeartsController extends GameController {
         return new StartGameRequest(heartsRulesConfig);
     }
 
-    @MessageMapping("/hearts/game-room/{gameId}/createGame")
-    @SendTo("/topic/hearts/game-room/{gameId}")
+    @MessageMapping("/hearts/game-room/{gameId}/startGame")
+    @SendTo("/topic/hearts/game-room/{gameId}/startGame")
     public GameStartMessage startGame(@DestinationVariable int gameId) {
         logger.log("Starting game with ID " + gameId);
-        HeartsService heartsService = heartsGameRooms.get(gameId);
+        HeartsService heartsService = getGameService(gameId);
         heartsService.startGame();
         return new GameStartMessage(heartsService.getRulesConfig(),
                 heartsService.getPlayers().stream().map(Player::getPlayerDescriptor).toList().toArray(new Player.PlayerDescriptor[0]));
@@ -59,9 +62,10 @@ public class HeartsController extends GameController {
     @MessageMapping("/hearts/game-room/{gameId}/joinGame")
     @SendTo("/topic/hearts/game-room/{gameId}/joinGame")
     public PlayerJoinedMessage joinGame(@DestinationVariable int gameId,
-                                        @Payload Player playerJoined){
-        heartsGameRooms.get(gameId).addPlayer(playerJoined);
-        return new PlayerJoinedMessage(playerJoined, gameId);
+                                        @Payload Player.PlayerDescriptor playerJoined){
+        Player playerToAdd = new HumanPlayer(playerJoined);
+        getGameService(gameId).addPlayer(playerToAdd);
+        return new PlayerJoinedMessage(playerToAdd, gameId);
     }
 
     @Override
@@ -70,11 +74,7 @@ public class HeartsController extends GameController {
     public PlayCardMessage playCard(
             @DestinationVariable int gameId,
             @Payload PlayCardMessage cardMessage){
-        if (!heartsGameRooms.containsKey(gameId)){
-            throw new IllegalArgumentException("Invalid Game ID");
-        }
-
-        heartsGameRooms.get(gameId).playCard(cardMessage);
+        getGameService(gameId).playCard(cardMessage);
         return cardMessage;
     }
 
@@ -97,6 +97,14 @@ public class HeartsController extends GameController {
             @DestinationVariable int gameId,
             @Payload ChatMessage chatMessage) {
         return chatMessage;
+    }
+
+    protected HeartsService getGameService(int gameId){
+        HeartsService gameService = heartsGameRooms.get(gameId);
+        if (gameService == null) {
+            throw new IllegalArgumentException("Game ID " + gameId + " does not exist.");
+        }
+        return gameService;
     }
 
 

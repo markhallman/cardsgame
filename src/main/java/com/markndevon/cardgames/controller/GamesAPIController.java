@@ -37,7 +37,7 @@ public class GamesAPIController {
     //TODO: Will a heartsRulesConfig properly parse here when its expecting its parent interface?
     @PostMapping("/games/creategame/{gameType}")
     public int createGame(@PathVariable String gameType,
-                          @RequestBody Player player,
+                          @RequestBody Player.PlayerDescriptor player,
                           @RequestBody(required = false) RulesConfig rulesConfig) {
         int gameID = GAME_ID_CREATOR.incrementAndGet();
 
