@@ -17,8 +17,8 @@ import java.util.List;
 @Service
 @Scope("prototype")
 public class HeartsService extends GameService {
+    // TODO: Game state tacking should be in parent class
     private boolean gameIsStarted = false;
-    private final List<Player> players = new ArrayList<>();
     private HeartsGameState heartsGame;
     @Autowired
     SimpMessagingTemplate clientMessenger;
@@ -29,9 +29,6 @@ public class HeartsService extends GameService {
     // TODO: Need to take in an initial playerID? Or just initialize a null list of players? GameState should probably track that
     public HeartsService(int gameId, HeartsRulesConfig rulesConfig){
         super(gameId, rulesConfig);
-        heartsGame = new HeartsGameState(new Player[]{}, rulesConfig, logger);
-        // TODO: IDK exactly what the timing of starting the game should be, maybe hold off for explicit game start request
-        startGame();
     }
     public void playCard(PlayCardMessage playCard){
         if(gameIsStarted){
@@ -50,8 +47,11 @@ public class HeartsService extends GameService {
     }
 */
 
+    @Override
     public void startGame(){
+        heartsGame = new HeartsGameState(getPlayers().toArray(new Player[getPlayers().size()]),(HeartsRulesConfig) rulesConfig, gameId, logger);
         heartsGame.start();
+        gameIsStarted = true;
         //TODO: Do we need to broadcast a gamestart message?
 
         // When we start the game, need to deal the cards and init the kitty
@@ -70,6 +70,7 @@ public class HeartsService extends GameService {
         updateClients();
     }
 
+    @Override
     public void updateClients(){
         UpdateCurrentTrickMessage currentTrickMessage = new UpdateCurrentTrickMessage(heartsGame.getCurrentTrickMap());
         clientMessenger.convertAndSend("/topic/hearts/" + gameId, currentTrickMessage);

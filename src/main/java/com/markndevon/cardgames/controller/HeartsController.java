@@ -5,6 +5,7 @@ import com.markndevon.cardgames.message.*;
 import com.markndevon.cardgames.model.Card;
 import com.markndevon.cardgames.model.config.HeartsRulesConfig;
 import com.markndevon.cardgames.model.config.RulesConfig;
+import com.markndevon.cardgames.model.player.Player;
 import com.markndevon.cardgames.service.HeartsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -17,9 +18,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /*
     Controller for a game of Hearts
+    // TODO: a chunk of this can probably be moved to the parent abstract class
  */
 @Controller
 public class HeartsController extends GameController {
@@ -33,19 +36,32 @@ public class HeartsController extends GameController {
     }
 
     @Override
-    @MessageMapping("/hearts/createGame")
     @SendTo("/topic/hearts/game-room")
     public StartGameRequest createGame(int gameId, RulesConfig heartsRulesConfig) {
         logger.log("Creating game with ID " + gameId);
         heartsGameRooms.put(gameId, new HeartsService(gameId, (HeartsRulesConfig) heartsRulesConfig));
+        //TODO: add the player who created the room
+
         return new StartGameRequest(heartsRulesConfig);
     }
 
+    @MessageMapping("/hearts/game-room/{gameId}/createGame")
+    @SendTo("/topic/hearts/game-room/{gameId}")
+    public GameStartMessage startGame(@DestinationVariable int gameId) {
+        logger.log("Starting game with ID " + gameId);
+        HeartsService heartsService = heartsGameRooms.get(gameId);
+        heartsService.startGame();
+        return new GameStartMessage(heartsService.getRulesConfig(),
+                heartsService.getPlayers().stream().map(Player::getPlayerDescriptor).toList().toArray(new Player.PlayerDescriptor[0]));
+    }
+
     @Override
-    @MessageMapping("/hearts/joinGame")
-    @SendTo("/topic/hearts/game-room")
-    public PlayerJoinedMessage joinGame(PlayerJoinedMessage playerJoined, int gameId){
-        return playerJoined;
+    @MessageMapping("/hearts/game-room/{gameId}/joinGame")
+    @SendTo("/topic/hearts/game-room/{gameId}/joinGame")
+    public PlayerJoinedMessage joinGame(@DestinationVariable int gameId,
+                                        @Payload Player playerJoined){
+        heartsGameRooms.get(gameId).addPlayer(playerJoined);
+        return new PlayerJoinedMessage(playerJoined, gameId);
     }
 
     @Override
@@ -82,4 +98,6 @@ public class HeartsController extends GameController {
             @Payload ChatMessage chatMessage) {
         return chatMessage;
     }
+
+
 }

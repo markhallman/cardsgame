@@ -1,12 +1,38 @@
 package com.markndevon.cardgames.service;
 
 import com.markndevon.cardgames.model.config.RulesConfig;
+import com.markndevon.cardgames.model.player.Player;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class GameService {
-    int gameId;
+    final int gameId;
     RulesConfig rulesConfig;
+    private final List<Player> players = new ArrayList<>();
+
     public GameService(int gameId, RulesConfig rulesConfig){
         this.gameId = gameId;
         this.rulesConfig = rulesConfig;
+
     }
+    public int getGameId() {
+        return gameId;
+    }
+
+    public RulesConfig getRulesConfig() {
+        return rulesConfig;
+    }
+
+    public List<Player> getPlayers(){
+        return players;
+    }
+
+    public void addPlayer(Player player){
+        players.add(player);
+    }
+
+    public abstract void startGame();
+    public abstract void updateClients();
 }

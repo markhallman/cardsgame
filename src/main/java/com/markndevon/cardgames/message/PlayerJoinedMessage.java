@@ -6,16 +6,16 @@ import com.markndevon.cardgames.model.player.Player;
  * Message to be sent to ALL clients when a new player has joined the lobby
  */
 public class PlayerJoinedMessage extends Message {
-    private final Player.PlayerDescriptor[] players;
+    private final Player player;
     private final int gameId;
-    public PlayerJoinedMessage(final Player.PlayerDescriptor[] players, int gameId) {
+    public PlayerJoinedMessage(final Player player, int gameId) {
 
-        this.players = players;
+        this.player = player;
         this.gameId = gameId;
     }
 
-    public Player.PlayerDescriptor[] getPlayers() {
-        return players;
+    public Player getPlayer() {
+        return player;
     }
 
     @Override

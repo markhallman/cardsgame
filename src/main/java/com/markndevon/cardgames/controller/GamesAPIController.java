@@ -2,6 +2,7 @@ package com.markndevon.cardgames.controller;
 
 import com.markndevon.cardgames.model.config.HeartsRulesConfig;
 import com.markndevon.cardgames.model.config.RulesConfig;
+import com.markndevon.cardgames.model.player.Player;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +36,9 @@ public class GamesAPIController {
     //TODO: A PLAYER name and/or ID should be passed along too
     //TODO: Will a heartsRulesConfig properly parse here when its expecting its parent interface?
     @PostMapping("/games/creategame/{gameType}")
-    public int createGame(@PathVariable String gameType, @RequestBody(required = false) RulesConfig rulesConfig) {
+    public int createGame(@PathVariable String gameType,
+                          @RequestBody Player player,
+                          @RequestBody(required = false) RulesConfig rulesConfig) {
         int gameID = GAME_ID_CREATOR.incrementAndGet();
 
         if (gameType.equalsIgnoreCase("HEARTS")){
@@ -43,7 +46,8 @@ public class GamesAPIController {
                 // Get default by building without setting any rules
                 rulesConfig = (new HeartsRulesConfig.Builder()).build();
             }
-            HEARTS_CONTROLLER.createGame(GAME_ID_CREATOR.incrementAndGet(), rulesConfig);
+            HEARTS_CONTROLLER.createGame(gameID, rulesConfig);
+            HEARTS_CONTROLLER.joinGame(gameID, player);
         } else {
             throw new IllegalArgumentException("Game Type " + gameType + " currently not supported");
         }

@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /*
     State information for a game of hearts
- */
+*/
 public class HeartsGameState extends GameState {
     private final List<Card> currentTrick = new ArrayList<>();
     private final Map<Player.PlayerDescriptor, Card> currentTrickMap = new LinkedHashMap<>();
@@ -35,16 +35,18 @@ public class HeartsGameState extends GameState {
     private final PassDeterminer passDeterminer;
 
 
-    public HeartsGameState(Player[] players, HeartsRulesConfig rulesConfig, Logger logger) {
-        super(players, rulesConfig, logger);
+    public HeartsGameState(Player[] players, HeartsRulesConfig rulesConfig, int gameId, Logger logger) {
+        super(players, rulesConfig, gameId, logger);
         this.passDeterminer = new PassDeterminer(players.length, rulesConfig);
 
     }
 
-    public void start(){
-        // TODO: Actually fill this out
-        //passCountDown = new AtomicInteger(players.length);
-        //possiblyPassCards();
+    public void start() {
+        dealNewHand();
+        logger.log("Starting game...");
+
+        // passCountDown = new AtomicInteger(players.length);
+        // possiblyPassCards();
     }
 
     //region getters
@@ -227,6 +229,7 @@ public class HeartsGameState extends GameState {
         }
     }
 /*
+    TODO: Add passing back in
     private void possiblyPassCards() {
         final PassDeterminer.PassingRule passingRule = passDeterminer.getPassingRule(handCount);
         final PassDeterminer.PassingRule.PassDirection passDirection = passingRule.getPassDirection();
