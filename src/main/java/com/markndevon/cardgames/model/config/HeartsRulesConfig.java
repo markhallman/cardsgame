@@ -182,7 +182,7 @@ public class HeartsRulesConfig implements RulesConfig {
         }
     }
 
-    public static class Builder {
+    public static class HeartsBuilder {
 
         private int startCardRules = START_CARD_RULES_2_CLUBS;
         private boolean pointsFirstTrick = POINTS_ALLOWED_FIRST_TRICK_DEFAULT;
@@ -196,34 +196,34 @@ public class HeartsRulesConfig implements RulesConfig {
         private boolean jackRequired = JACK_REQUIRED_DEFAULT;
         private boolean kittyWonFirstTrick = KITTY_WON_FIRST_TRICK_DEFAULT;
 
-        public Builder() {}
+        public HeartsBuilder() {}
 
-        public Builder setStartCardRules(final int startCardRules) {
+        public HeartsBuilder setStartCardRules(final int startCardRules) {
             this.startCardRules = startCardRules;
             return this;
         }
 
-        public Builder setPointsFirstTrick(final boolean pointsFirstTrick) {
+        public HeartsBuilder setPointsFirstTrick(final boolean pointsFirstTrick) {
             this.pointsFirstTrick = pointsFirstTrick;
             return this;
         }
 
-        public Builder setHeartsMustBeBroken(final boolean heartsMustBeBroken) {
+        public HeartsBuilder setHeartsMustBeBroken(final boolean heartsMustBeBroken) {
             this.heartsMustBeBroken = heartsMustBeBroken;
             return this;
         }
 
-        public Builder setJackMinus10(final boolean jackMinus10) {
+        public HeartsBuilder setJackMinus10(final boolean jackMinus10) {
             this.jackMinus10 = jackMinus10;
             return this;
         }
 
-        public Builder setNoTricksMinus5(final boolean noTricksMinus5) {
+        public HeartsBuilder setNoTricksMinus5(final boolean noTricksMinus5) {
             this.noTricksMinus5 = noTricksMinus5;
             return this;
         }
 
-        public Builder setShootTheSun(final boolean shootTheSun) {
+        public HeartsBuilder setShootTheSun(final boolean shootTheSun) {
             this.shootTheSun = shootTheSun;
             return this;
         }
@@ -232,7 +232,7 @@ public class HeartsRulesConfig implements RulesConfig {
             this.pointsToLose = pointsToLose;
         }
 
-        public Builder setJackRequired(final boolean jackRequired) {
+        public HeartsBuilder setJackRequired(final boolean jackRequired) {
             this.jackRequired = jackRequired;
             return this;
         }
@@ -257,9 +257,13 @@ public class HeartsRulesConfig implements RulesConfig {
                 case FIRST_TRICK -> setStartCardRules(value);
             }
         }
-        public RulesConfig build() {
+        public HeartsRulesConfig build() {
             return new HeartsRulesConfig(startCardRules, pointsFirstTrick, heartsMustBeBroken,
                     jackMinus10, noTricksMinus5, shootTheSun, pointsToLose, jackRequired, kittyWonFirstTrick);
         }
+    }
+
+    public static HeartsRulesConfig getDefault(){
+        return (new HeartsBuilder()).build();
     }
 }

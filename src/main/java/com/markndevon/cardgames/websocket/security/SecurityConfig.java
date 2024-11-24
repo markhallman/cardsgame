@@ -19,7 +19,7 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable) // Explicitly disable CSRF for now; configure appropriately for production
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/public/**").permitAll() // Allow public endpoints
+                        .requestMatchers("/ws/**").permitAll() // Allow ws endpoints (for now, lock down later)
                         .anyRequest().authenticated()              // Secure everything else
                 ).httpBasic(httpBasic -> {}); // Basic Auth (JWT is recommended for production)
 
@@ -35,7 +35,7 @@ public class SecurityConfig {
     public UserDetailsService userDetailsService() {
         // In memory user athentication, really we want this to be backed by a database of users
         UserDetails user = User.builder()
-                .username("player1")
+                .username("user")
                 .password(passwordEncoder().encode("password"))
                 .roles("PLAYER")
                 .build();

@@ -1,7 +1,10 @@
 package com.markndevon.cardgames.controller;
 
+import com.markndevon.cardgames.message.CreateGameMessage;
+import com.markndevon.cardgames.message.GameStartMessage;
 import com.markndevon.cardgames.model.config.HeartsRulesConfig;
 import com.markndevon.cardgames.model.config.RulesConfig;
+import com.markndevon.cardgames.model.player.HumanPlayer;
 import com.markndevon.cardgames.model.player.Player;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -34,23 +37,22 @@ public class GamesAPIController {
      * @param gameType the name of the game that is being played
      * @return the game ID of the newly created game
      */
-    //TODO: A PLAYER name and/or ID should be passed along too
-    //TODO: Will a heartsRulesConfig properly parse here when its expecting its parent interface?
     @PostMapping("/games/creategame/{gameType}")
     public int createGame(@PathVariable String gameType,
-                          @RequestBody Player.PlayerDescriptor player,
-                          @RequestBody(required = false) RulesConfig rulesConfig,
+                          @RequestBody CreateGameMessage createGameMessage,
                           SimpMessageHeaderAccessor headerAccessor) {
         int gameID = GAME_ID_CREATOR.incrementAndGet();
         String username = (String) headerAccessor.getSessionAttributes().get("username");
+        RulesConfig rulesConfig = createGameMessage.getRulesConfig();
+        HumanPlayer player = createGameMessage.getCreatingPlayer();
 
         if (gameType.equalsIgnoreCase("HEARTS")){
             if(rulesConfig == null){
                 // Get default by building without setting any rules
-                rulesConfig = (new HeartsRulesConfig.Builder()).build();
+                rulesConfig = HeartsRulesConfig.getDefault();
             }
             HEARTS_CONTROLLER.createGame(gameID, rulesConfig, username);
-            HEARTS_CONTROLLER.joinGame(gameID, player);
+            HEARTS_CONTROLLER.joinGame(gameID, player.getPlayerDescriptor());
         } else {
             throw new IllegalArgumentException("Game Type " + gameType + " currently not supported");
         }

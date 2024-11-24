@@ -103,21 +103,21 @@ public abstract class Player {
     public record PlayerDescriptor(String name, int id, boolean isHumanControlled) {
 
         @Override
-            public boolean equals(Object o) {
-                if (this == o) return true;
-                if (o == null || getClass() != o.getClass()) return false;
-                PlayerDescriptor player = (PlayerDescriptor) o;
-                return id == player.id;
-            }
-
-            @Override
-            public String toString() {
-                return "Player --- name: " + this.name + " ID: " + this.id + " isHumanControlled: " + this.isHumanControlled;
-            }
-
-            @Override
-            public int hashCode() {
-                return Objects.hash(id);
-            }
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            PlayerDescriptor player = (PlayerDescriptor) o;
+            return id == player.id;
         }
+
+        @Override
+        public String toString() {
+            return "Player --- name: " + this.name + " ID: " + this.id + " isHumanControlled: " + this.isHumanControlled;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(id);
+        }
+    }
 }
