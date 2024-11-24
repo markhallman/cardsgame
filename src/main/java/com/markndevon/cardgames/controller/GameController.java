@@ -13,7 +13,7 @@ import org.springframework.stereotype.Controller;
     Generic interface for game controller, handles communication from the client to manage the game state
  */
 public abstract class GameController {
-    public abstract StartGameRequest createGame(int gameId, RulesConfig rulesConfig);
+    public abstract StartGameRequest createGame(int gameId, RulesConfig rulesConfig, String username);
     public abstract PlayerJoinedMessage joinGame(int gameId, Player.PlayerDescriptor player);
     public abstract PlayCardMessage playCard(int gameId, PlayCardMessage cardMessage);
 

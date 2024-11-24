@@ -6,6 +6,7 @@ import com.markndevon.cardgames.model.config.HeartsRulesConfig;
 import com.markndevon.cardgames.model.gamestates.HeartsGameState;
 import com.markndevon.cardgames.model.player.HumanPlayer;
 import com.markndevon.cardgames.model.player.Player;
+import com.markndevon.cardgames.model.player.RandomAIPlayer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -49,7 +50,7 @@ public class HeartsService extends GameService {
 
     @Override
     public void startGame(){
-        heartsGame = new HeartsGameState(getPlayers().toArray(new Player[getPlayers().size()]),(HeartsRulesConfig) rulesConfig, gameId, logger);
+        heartsGame = new HeartsGameState(possiblyFillPlayers() ,(HeartsRulesConfig) rulesConfig, gameId, logger);
         heartsGame.start();
         gameIsStarted = true;
         //TODO: Do we need to broadcast a gamestart message?
@@ -60,7 +61,7 @@ public class HeartsService extends GameService {
                 DealMessage dealMessage = new DealMessage(player.getHand());
                 UpdateLegalPlaysMessage legalPlaysMessage = new UpdateLegalPlaysMessage(heartsGame.getLegalPlays(player));
                 // TODO: I seriously doubt the player name is how spring will be storing this, need to figure that out
-                // TODO: Repeated code seciton with updateClients
+                // TODO: Repeated code section with updateClients
 
                 clientMessenger.convertAndSendToUser(player.getName(), "/hearts/game-room/" + gameId + "/deal", dealMessage);
                 clientMessenger.convertAndSendToUser(player.getName(), "/hearts/game-room/" + gameId + "/legalPlays", legalPlaysMessage);
@@ -86,6 +87,16 @@ public class HeartsService extends GameService {
                 clientMessenger.convertAndSendToUser(player.getName(), "/hearts/game-room" + gameId + "/legalPlays", legalPlaysMessage);
             }
         }
+    }
+
+    private Player[] possiblyFillPlayers() {
+        int size = getPlayers().size();
+
+        for(int i = size; i < 4; i++) {
+            addPlayer(new RandomAIPlayer("AI" + i, i));
+        }
+
+        return getPlayers().toArray(new Player[0]);
     }
 
     public void setLogger(Logger newLogger){

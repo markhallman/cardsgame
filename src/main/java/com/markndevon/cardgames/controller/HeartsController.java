@@ -10,10 +10,8 @@ import com.markndevon.cardgames.model.player.Player;
 import com.markndevon.cardgames.service.GameService;
 import com.markndevon.cardgames.service.HeartsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.handler.annotation.*;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,8 +38,12 @@ public class HeartsController extends GameController {
 
     @Override
     @SendTo("/topic/hearts/game-room")
-    public StartGameRequest createGame(int gameId, RulesConfig heartsRulesConfig) {
+    public StartGameRequest createGame(int gameId,
+                                       RulesConfig heartsRulesConfig,
+                                       @Header("username") String username) {
         logger.log("Creating game with ID " + gameId);
+        HeartsService heartsService = new HeartsService(gameId, (HeartsRulesConfig) heartsRulesConfig);
+        heartsService.addPlayer(new HumanPlayer(username, 0)); // Just assigning id 0 is okay here since its the first player
         heartsGameRooms.put(gameId, new HeartsService(gameId, (HeartsRulesConfig) heartsRulesConfig));
         //TODO: add the player who created the room
 
@@ -49,7 +51,6 @@ public class HeartsController extends GameController {
     }
 
     @MessageMapping("/hearts/game-room/{gameId}/startGame")
-    @SendTo("/topic/hearts/game-room/{gameId}/startGame")
     public GameStartMessage startGame(@DestinationVariable int gameId) {
         logger.log("Starting game with ID " + gameId);
         HeartsService heartsService = getGameService(gameId);
@@ -60,7 +61,6 @@ public class HeartsController extends GameController {
 
     @Override
     @MessageMapping("/hearts/game-room/{gameId}/joinGame")
-    @SendTo("/topic/hearts/game-room/{gameId}/joinGame")
     public PlayerJoinedMessage joinGame(@DestinationVariable int gameId,
                                         @Payload Player.PlayerDescriptor playerJoined){
         Player playerToAdd = new HumanPlayer(playerJoined);
@@ -69,8 +69,7 @@ public class HeartsController extends GameController {
     }
 
     @Override
-    @MessageMapping("/hearts/{gameId}/playCard")
-    @SendTo("/topic/hearts/game-room/{gameId}/playCard")
+    @MessageMapping("/hearts/game-room/{gameId}/playCard")
     public PlayCardMessage playCard(
             @DestinationVariable int gameId,
             @Payload PlayCardMessage cardMessage){
@@ -91,8 +90,7 @@ public class HeartsController extends GameController {
     */
 
 
-    @MessageMapping("/hearts/{gameId}/chat")
-    @SendTo("/topic/hearts/game-room/{gameId}/chat")
+    @MessageMapping("/hearts/game-room/{gameId}/chat")
     public ChatMessage chatMessage(
             @DestinationVariable int gameId,
             @Payload ChatMessage chatMessage) {
@@ -105,6 +103,14 @@ public class HeartsController extends GameController {
             throw new IllegalArgumentException("Game ID " + gameId + " does not exist.");
         }
         return gameService;
+    }
+
+    @MessageExceptionHandler
+    public void handleException(Exception exception) throws Exception{
+        // TODO: Add exception handling
+        throw exception;
+        // ...
+        //return appError;
     }
 
 

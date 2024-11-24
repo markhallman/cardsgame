@@ -4,6 +4,7 @@ import com.markndevon.cardgames.model.config.HeartsRulesConfig;
 import com.markndevon.cardgames.model.config.RulesConfig;
 import com.markndevon.cardgames.model.player.Player;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,15 +39,17 @@ public class GamesAPIController {
     @PostMapping("/games/creategame/{gameType}")
     public int createGame(@PathVariable String gameType,
                           @RequestBody Player.PlayerDescriptor player,
-                          @RequestBody(required = false) RulesConfig rulesConfig) {
+                          @RequestBody(required = false) RulesConfig rulesConfig,
+                          SimpMessageHeaderAccessor headerAccessor) {
         int gameID = GAME_ID_CREATOR.incrementAndGet();
+        String username = (String) headerAccessor.getSessionAttributes().get("username");
 
         if (gameType.equalsIgnoreCase("HEARTS")){
             if(rulesConfig == null){
                 // Get default by building without setting any rules
                 rulesConfig = (new HeartsRulesConfig.Builder()).build();
             }
-            HEARTS_CONTROLLER.createGame(gameID, rulesConfig);
+            HEARTS_CONTROLLER.createGame(gameID, rulesConfig, username);
             HEARTS_CONTROLLER.joinGame(gameID, player);
         } else {
             throw new IllegalArgumentException("Game Type " + gameType + " currently not supported");
