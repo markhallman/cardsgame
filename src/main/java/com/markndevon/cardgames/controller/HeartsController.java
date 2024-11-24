@@ -2,24 +2,17 @@ package com.markndevon.cardgames.controller;
 
 import com.markndevon.cardgames.logger.Logger;
 import com.markndevon.cardgames.message.*;
-import com.markndevon.cardgames.model.Card;
 import com.markndevon.cardgames.model.config.HeartsRulesConfig;
 import com.markndevon.cardgames.model.config.RulesConfig;
 import com.markndevon.cardgames.model.player.HumanPlayer;
 import com.markndevon.cardgames.model.player.Player;
-import com.markndevon.cardgames.service.GameService;
 import com.markndevon.cardgames.service.HeartsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.*;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 /*
     Controller for a game of Hearts
@@ -29,7 +22,7 @@ import java.util.stream.Collectors;
 public class HeartsController extends GameController {
 
     //TODO: Make sure game removals are handled correctly. Scheduled task to remove inactive games?
-    private Map<Integer, HeartsService> heartsGameRooms = new ConcurrentHashMap<>();
+    private final Map<Integer, HeartsService> heartsGameRooms = new ConcurrentHashMap<>();
     @Autowired
     private Logger logger;
 
