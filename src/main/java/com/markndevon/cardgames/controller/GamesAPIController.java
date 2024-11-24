@@ -44,12 +44,12 @@ public class GamesAPIController {
         int gameID = GAME_ID_CREATOR.incrementAndGet();
         String username = (String) headerAccessor.getSessionAttributes().get("username");
         RulesConfig rulesConfig = createGameMessage.getRulesConfig();
-        HumanPlayer player = createGameMessage.getCreatingPlayer();
+        HumanPlayer player = new HumanPlayer(createGameMessage.getCreatingPlayer());
 
         if (gameType.equalsIgnoreCase("HEARTS")){
             if(rulesConfig == null){
                 // Get default by building without setting any rules
-                rulesConfig = HeartsRulesConfig.getDefault();
+                rulesConfig = (new HeartsRulesConfig.HeartsBuilder()).build();
             }
             HEARTS_CONTROLLER.createGame(gameID, rulesConfig, username);
             HEARTS_CONTROLLER.joinGame(gameID, player.getPlayerDescriptor());

@@ -263,7 +263,4 @@ public class HeartsRulesConfig implements RulesConfig {
         }
     }
 
-    public static HeartsRulesConfig getDefault(){
-        return (new HeartsBuilder()).build();
-    }
 }

@@ -7,13 +7,13 @@ import com.markndevon.cardgames.model.player.Player;
 public class CreateGameMessage {
 
     private final RulesConfig rulesConfig;
-    private final HumanPlayer creatingPlayer;
+    private final Player.PlayerDescriptor creatingPlayer;
 
-    public CreateGameMessage(final HumanPlayer creatingPlayer) {
-        this(creatingPlayer, RulesConfig.getDefault());
+    public CreateGameMessage(final Player.PlayerDescriptor creatingPlayer) {
+        this(creatingPlayer, null);
     }
 
-    public CreateGameMessage(final HumanPlayer creatingPlayer, final RulesConfig rulesConfig) {
+    public CreateGameMessage(final Player.PlayerDescriptor creatingPlayer, final RulesConfig rulesConfig) {
         this.rulesConfig = rulesConfig;
         this.creatingPlayer = creatingPlayer;
     }
@@ -22,7 +22,7 @@ public class CreateGameMessage {
         return rulesConfig;
     }
 
-    public HumanPlayer getCreatingPlayer() {
+    public Player.PlayerDescriptor getCreatingPlayer() {
         return creatingPlayer;
     }
 
