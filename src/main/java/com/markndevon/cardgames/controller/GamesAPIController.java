@@ -6,6 +6,7 @@ import com.markndevon.cardgames.model.config.HeartsRulesConfig;
 import com.markndevon.cardgames.model.config.RulesConfig;
 import com.markndevon.cardgames.model.player.HumanPlayer;
 import com.markndevon.cardgames.model.player.Player;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
@@ -40,9 +41,9 @@ public class GamesAPIController {
     @PostMapping("/games/creategame/{gameType}")
     public int createGame(@PathVariable String gameType,
                           @RequestBody CreateGameMessage createGameMessage,
-                          SimpMessageHeaderAccessor headerAccessor) {
+                          HttpServletRequest request) {
         int gameID = GAME_ID_CREATOR.incrementAndGet();
-        String username = (String) headerAccessor.getSessionAttributes().get("username");
+        String username = (String) request.getAttribute("username");
         RulesConfig rulesConfig = createGameMessage.getRulesConfig();
         HumanPlayer player = new HumanPlayer(createGameMessage.getCreatingPlayer());
 
