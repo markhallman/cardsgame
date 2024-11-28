@@ -10,6 +10,7 @@ import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 import java.security.Principal;
 import java.util.Map;
 
+//TODO: Is this necessary anymore?
 @Component
 public class WebSocketUserIdentifier implements HandshakeInterceptor {
 

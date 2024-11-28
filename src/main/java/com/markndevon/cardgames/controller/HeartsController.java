@@ -6,6 +6,7 @@ import com.markndevon.cardgames.model.config.HeartsRulesConfig;
 import com.markndevon.cardgames.model.config.RulesConfig;
 import com.markndevon.cardgames.model.player.HumanPlayer;
 import com.markndevon.cardgames.model.player.Player;
+import com.markndevon.cardgames.service.GameServiceFactory;
 import com.markndevon.cardgames.service.HeartsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.*;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Controller;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static com.markndevon.cardgames.model.gamestates.GameType.HEARTS;
 
 /*
     Controller for a game of Hearts
@@ -26,7 +29,10 @@ public class HeartsController extends GameController {
     @Autowired
     private Logger logger;
 
-    public HeartsController() {
+    private GameServiceFactory gameServiceFactory;
+
+    public HeartsController(GameServiceFactory gameServiceFactory) {
+        this.gameServiceFactory = gameServiceFactory;
     }
 
     @Override
@@ -35,9 +41,10 @@ public class HeartsController extends GameController {
                                        RulesConfig heartsRulesConfig,
                                        @Header("username") String username) {
         logger.log("Creating game with ID " + gameId);
-        HeartsService heartsService = new HeartsService(gameId, (HeartsRulesConfig) heartsRulesConfig);
+        logger.log("username for usee is:  " + username);
+        HeartsService heartsService = (HeartsService) gameServiceFactory.createGameService(HEARTS, gameId, heartsRulesConfig);
         heartsService.addPlayer(new HumanPlayer(username, 0)); // Just assigning id 0 is okay here since its the first player
-        heartsGameRooms.put(gameId, new HeartsService(gameId, (HeartsRulesConfig) heartsRulesConfig));
+        heartsGameRooms.put(gameId, heartsService);
         //TODO: add the player who created the room
 
         return new StartGameRequest(heartsRulesConfig);

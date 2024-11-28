@@ -7,6 +7,7 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
@@ -35,13 +36,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registration.interceptors(new ChannelInterceptor() {
             @Override
             public Message<?> preSend(Message<?> message, MessageChannel channel) {
-                // Retrieve the authenticated user's username
-                String username = SecurityContextHolder.getContext().getAuthentication().getName();
-
+                var authentication = SecurityContextHolder.getContext().getAuthentication();
+                String username = (authentication != null) ? authentication.getName() : "anonymousUser";
+                // TODO: Throw error if authenitcation went wrong instead of default user
                 // Add the username to the message headers
-                message.getHeaders().put("username", username);
+                Message newMessage = MessageBuilder.fromMessage(message)
+                                        .setHeader("username", username)
+                                        .build();
 
-                return message;
+                return newMessage;
             }
         });
     }

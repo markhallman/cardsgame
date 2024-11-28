@@ -1,5 +1,6 @@
 package com.markndevon.cardgames.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.markndevon.cardgames.model.util.Randomizer;
 import com.markndevon.cardgames.model.util.ResourceManager;
 
@@ -45,7 +46,10 @@ public class Card {
 
     private final Suit suit;
     private final Value value;
+    @JsonIgnore
     private final Image image;
+
+    @JsonIgnore
     private final Image rotatedImage;
     public Card(final Suit suit, final Value value) {
         this.suit = suit;

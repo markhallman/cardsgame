@@ -11,6 +11,7 @@ import com.markndevon.cardgames.model.scoreboard.HeartsScoreboard;
 import com.markndevon.cardgames.model.scoreboard.ScoreBoard;
 import com.markndevon.cardgames.model.util.Util;
 import com.markndevon.cardgames.model.util.hearts.PassDeterminer;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -34,11 +35,14 @@ public class HeartsGameState extends GameState {
     private boolean kittyWon = false;
     private final PassDeterminer passDeterminer;
 
+    @Autowired
+    private final Logger logger;
+
 
     public HeartsGameState(Player[] players, HeartsRulesConfig rulesConfig, int gameId, Logger logger) {
         super(players, rulesConfig, gameId, logger);
         this.passDeterminer = new PassDeterminer(players.length, rulesConfig);
-
+        this.logger = logger;
     }
 
     public void start() {
@@ -165,6 +169,9 @@ public class HeartsGameState extends GameState {
         logger.log("Player " + currentPlayer + " played card " + card);
 
         currentPlayer = players[(currentPlayer.getId() + 1) % players.length];
+
+        // TODO: Check if the current player is a CPU now, if it is, resolve that play as well and loop.
+
         possiblyResolveTrick();
         possiblyResolveHand();
 

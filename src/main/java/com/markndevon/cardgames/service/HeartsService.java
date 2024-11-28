@@ -15,21 +15,21 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
-@Scope("prototype")
 public class HeartsService extends GameService {
     // TODO: Game state tacking should be in parent class
     private boolean gameIsStarted = false;
     private HeartsGameState heartsGame;
-    @Autowired
-    SimpMessagingTemplate clientMessenger;
 
-    @Autowired
-    Logger logger;
+    private SimpMessagingTemplate clientMessenger;
+    private Logger logger;
+
 
     // TODO: Need to take in an initial playerID? Or just initialize a null list of players? GameState should probably track that
-    public HeartsService(int gameId, HeartsRulesConfig rulesConfig){
+    public HeartsService(int gameId, HeartsRulesConfig rulesConfig, SimpMessagingTemplate clientMessenger, Logger logger){
         super(gameId, rulesConfig);
+        this.clientMessenger = clientMessenger;
+        this.logger = logger;
+
     }
     public void playCard(PlayCardMessage playCard){
         if(gameIsStarted){
@@ -50,7 +50,7 @@ public class HeartsService extends GameService {
 
     @Override
     public void startGame(){
-        heartsGame = new HeartsGameState(possiblyFillPlayers() ,(HeartsRulesConfig) rulesConfig, gameId, logger);
+        heartsGame = new HeartsGameState(possiblyFillPlayers(), (HeartsRulesConfig) rulesConfig, gameId, logger);
         heartsGame.start();
         gameIsStarted = true;
         //TODO: Do we need to broadcast a gamestart message?
@@ -63,6 +63,7 @@ public class HeartsService extends GameService {
                 // TODO: I seriously doubt the player name is how spring will be storing this, need to figure that out
                 // TODO: Repeated code section with updateClients
 
+                System.out.println(player.getName());
                 clientMessenger.convertAndSendToUser(player.getName(), "/hearts/game-room/" + gameId + "/deal", dealMessage);
                 clientMessenger.convertAndSendToUser(player.getName(), "/hearts/game-room/" + gameId + "/legalPlays", legalPlaysMessage);
             }
@@ -96,10 +97,9 @@ public class HeartsService extends GameService {
             addPlayer(new RandomAIPlayer("AI" + i, i));
         }
 
+        System.out.println("Filling up game: " + getPlayers());
+
         return getPlayers().toArray(new Player[0]);
     }
 
-    public void setLogger(Logger newLogger){
-        logger = newLogger;
-    }
 }

@@ -19,7 +19,7 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable) // Explicitly disable CSRF for now; configure appropriately for production
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/ws/**").permitAll() // Allow ws endpoints (for now, lock down later)
+                        .requestMatchers("/ws/**").authenticated() // Allow ws endpoints (for now, lock down later)
                         .anyRequest().authenticated()              // Secure everything else
                 ).httpBasic(httpBasic -> {}); // Basic Auth (JWT is recommended for production)
 

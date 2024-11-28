@@ -9,6 +9,8 @@ import com.markndevon.cardgames.model.player.Player;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,10 +42,11 @@ public class GamesAPIController {
      */
     @PostMapping("/games/creategame/{gameType}")
     public int createGame(@PathVariable String gameType,
-                          @RequestBody CreateGameMessage createGameMessage,
-                          HttpServletRequest request) {
+                          @RequestBody CreateGameMessage createGameMessage) {
         int gameID = GAME_ID_CREATOR.incrementAndGet();
-        String username = (String) request.getAttribute("username");
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication != null ? authentication.getName() : "anonymousUser";
+
         RulesConfig rulesConfig = createGameMessage.getRulesConfig();
         HumanPlayer player = new HumanPlayer(createGameMessage.getCreatingPlayer());
 
