@@ -2,6 +2,7 @@ package com.markndevon.cardgames.model.gamestates;
 
 import com.markndevon.cardgames.logger.Logger;
 import com.markndevon.cardgames.message.PassCardsMessage;
+import com.markndevon.cardgames.message.PlayCardMessage;
 import com.markndevon.cardgames.message.UpdateScoreBoardMessage;
 import com.markndevon.cardgames.model.Card;
 import com.markndevon.cardgames.model.config.HeartsRulesConfig;
@@ -47,7 +48,12 @@ public class HeartsGameState extends GameState {
 
     public void start() {
         dealNewHand();
+        determineStartingPlayer();
         logger.log("Starting game...");
+
+        if(!currentPlayer.isHumanControlled()){
+            playCard(currentPlayer, currentPlayer.getNextPlay(this));
+        }
 
         // passCountDown = new AtomicInteger(players.length);
         // possiblyPassCards();
@@ -105,6 +111,18 @@ public class HeartsGameState extends GameState {
         kitty.addAll(extraCards);
     }
 
+    private void determineStartingPlayer() {
+        if(((HeartsRulesConfig) rulesConfig).getStartCardRules() == HeartsRulesConfig.START_CARD_RULES_2_CLUBS) {
+            currentPlayer = getStartingPlayer2ClubsRules();
+        } else if(lastStartingPlayer == null) {
+            currentPlayer = players[0];
+        } else {
+            currentPlayer = players[(lastStartingPlayer.getId() + 1) % players.length];
+        }
+
+        trickLeader = currentPlayer;
+    }
+
     private void gameOver() {
         //todo
     }
@@ -158,22 +176,29 @@ public class HeartsGameState extends GameState {
             return false;
         }
 
+        PlayCardMessage test = new PlayCardMessage(player.getPlayerDescriptor(), card);
+        test.debugSerialization();
+
         logger.log("Player " + player + " playing card " + card);
 
         currentPlayer.removeCard(card);
         currentTrick.add(card);
         currentTrickMap.put(player.getPlayerDescriptor(), card);
 
-        // TODO: Need to communicate back to client here?
-
         logger.log("Player " + currentPlayer + " played card " + card);
 
         currentPlayer = players[(currentPlayer.getId() + 1) % players.length];
 
-        // TODO: Check if the current player is a CPU now, if it is, resolve that play as well and loop.
+        dumpGameInfo();
 
         possiblyResolveTrick();
         possiblyResolveHand();
+
+        // If the next player id a CPU, resolve their action as well
+        if(!currentPlayer.isHumanControlled()){
+            // Need a way to rebroadcast syaye
+            playCard(currentPlayer, currentPlayer.getNextPlay(this));
+        }
 
         return true;
     }

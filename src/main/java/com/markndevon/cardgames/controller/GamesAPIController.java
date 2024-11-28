@@ -56,7 +56,6 @@ public class GamesAPIController {
                 rulesConfig = (new HeartsRulesConfig.HeartsBuilder()).build();
             }
             HEARTS_CONTROLLER.createGame(gameID, rulesConfig, username);
-            HEARTS_CONTROLLER.joinGame(gameID, player.getPlayerDescriptor());
         } else {
             throw new IllegalArgumentException("Game Type " + gameType + " currently not supported");
         }

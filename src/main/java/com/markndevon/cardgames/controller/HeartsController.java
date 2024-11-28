@@ -73,6 +73,7 @@ public class HeartsController extends GameController {
     public PlayCardMessage playCard(
             @DestinationVariable int gameId,
             @Payload PlayCardMessage cardMessage){
+        // TODO: Need a way to rebroadcast full gamestate probably, because CPU plays wont broadcast a play message
         getGameService(gameId).playCard(cardMessage);
         return cardMessage;
     }
