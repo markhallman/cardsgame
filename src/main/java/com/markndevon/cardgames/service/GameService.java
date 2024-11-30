@@ -1,21 +1,21 @@
 package com.markndevon.cardgames.service;
 
-import com.markndevon.cardgames.logger.Logger;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.markndevon.cardgames.model.config.RulesConfig;
 import com.markndevon.cardgames.model.gamestates.GameState;
 import com.markndevon.cardgames.model.player.Player;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class GameService {
-    final int gameId;
-    RulesConfig rulesConfig;
+    protected final int gameId;
+    protected RulesConfig rulesConfig;
     protected final List<Player> players = new ArrayList<>();
 
+    protected boolean gameIsStarted = false;
+
+    @JsonIgnore
     GameState gameState;
 
     public GameService(int gameId, RulesConfig rulesConfig){

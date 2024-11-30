@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.*;
 import org.springframework.stereotype.Controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -83,8 +84,8 @@ public class HeartsController extends GameController {
     }
 
     @Override
-    public List<GameState> getActiveGames() {
-        return heartsGameRooms.values().stream().map(GameService::getGameState).collect(Collectors.toList());
+    public List<GameService> getActiveGames() {
+        return new ArrayList<>(heartsGameRooms.values());
     }
 
     /*

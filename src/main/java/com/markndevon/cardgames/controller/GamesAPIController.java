@@ -1,18 +1,14 @@
 package com.markndevon.cardgames.controller;
 
+import com.markndevon.cardgames.message.ActiveGamesMessage;
 import com.markndevon.cardgames.message.CreateGameMessage;
-import com.markndevon.cardgames.message.GameStartMessage;
 import com.markndevon.cardgames.model.config.HeartsRulesConfig;
 import com.markndevon.cardgames.model.config.RulesConfig;
 import com.markndevon.cardgames.model.gamestates.GameState;
-import com.markndevon.cardgames.model.player.HumanPlayer;
-import com.markndevon.cardgames.model.player.Player;
-import jakarta.servlet.http.HttpServletRequest;
+import com.markndevon.cardgames.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -64,11 +60,13 @@ public class GamesAPIController {
         return gameID;
     }
 
-    // TODO: actually return game list?
     @GetMapping("/games/activegames")
-    public List<GameState> getActiveGames(){
+    public ActiveGamesMessage getActiveGames(){
         List<GameController> controllers = new ArrayList<>();
         controllers.add(HEARTS_CONTROLLER);
-        return controllers.stream().flatMap(controller -> controller.getActiveGames().stream()).collect(Collectors.toList());
+        return new ActiveGamesMessage(controllers
+                .stream()
+                .flatMap(controller -> controller.getActiveGames().stream())
+                .collect(Collectors.toList()));
     }
 }

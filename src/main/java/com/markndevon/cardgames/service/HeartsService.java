@@ -1,5 +1,6 @@
 package com.markndevon.cardgames.service;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.markndevon.cardgames.logger.Logger;
 import com.markndevon.cardgames.message.*;
 import com.markndevon.cardgames.model.config.HeartsRulesConfig;
@@ -7,20 +8,12 @@ import com.markndevon.cardgames.model.gamestates.HeartsGameState;
 import com.markndevon.cardgames.model.player.HumanPlayer;
 import com.markndevon.cardgames.model.player.Player;
 import com.markndevon.cardgames.model.player.RandomAIPlayer;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class HeartsService extends GameService {
-    // TODO: Game state tacking should be in parent class
-    private boolean gameIsStarted = false;
-    private HeartsGameState heartsGame;
-
+    @JsonIgnore
     private SimpMessagingTemplate clientMessenger;
+    @JsonIgnore
     private Logger logger;
 
 
@@ -33,7 +26,7 @@ public class HeartsService extends GameService {
     }
     public void playCard(PlayCardMessage playCard){
         if(gameIsStarted){
-            heartsGame.playCard(new HumanPlayer(playCard.getPlayerDescriptor()), playCard.getCard());
+            ((HeartsGameState) gameState).playCard(new HumanPlayer(playCard.getPlayerDescriptor()), playCard.getCard());
             updateClients();
         } else {
             // TODO: error handling
@@ -56,10 +49,10 @@ public class HeartsService extends GameService {
         //TODO: Do we need to broadcast a gamestart message?
 
         // When we start the game, need to deal the cards and init the kitty
-        for(Player player : heartsGame.getPlayers()) {
+        for(Player player : ((HeartsGameState) gameState).getPlayers()) {
             if(player.isHumanControlled()){
                 DealMessage dealMessage = new DealMessage(player.getHand());
-                UpdateLegalPlaysMessage legalPlaysMessage = new UpdateLegalPlaysMessage(heartsGame.getLegalPlays(player));
+                UpdateLegalPlaysMessage legalPlaysMessage = new UpdateLegalPlaysMessage(((HeartsGameState) gameState).getLegalPlays(player));
                 // TODO: I seriously doubt the player name is how spring will be storing this, need to figure that out
                 // TODO: Repeated code section with updateClients
 
@@ -74,16 +67,16 @@ public class HeartsService extends GameService {
 
     @Override
     public void updateClients(){
-        UpdateCurrentTrickMessage currentTrickMessage = new UpdateCurrentTrickMessage(heartsGame.getCurrentTrickMap());
+        UpdateCurrentTrickMessage currentTrickMessage = new UpdateCurrentTrickMessage(((HeartsGameState) gameState).getCurrentTrickMap());
         clientMessenger.convertAndSend("/hearts/game-room/" + gameId + "/currentTrick", currentTrickMessage);
 
-        UpdateScoreBoardMessage scoreBoardMessage = new UpdateScoreBoardMessage(heartsGame.getScoreBoard().getScore());
+        UpdateScoreBoardMessage scoreBoardMessage = new UpdateScoreBoardMessage(((HeartsGameState) gameState).getScoreBoard().getScore());
         clientMessenger.convertAndSend("/hearts/game-room/" + gameId + "/updateScore", scoreBoardMessage);
 
         // Send the legal plays individually to each player
-        for(Player player : heartsGame.getPlayers()) {
+        for(Player player : ((HeartsGameState) gameState).getPlayers()) {
             if(player.isHumanControlled()){
-                UpdateLegalPlaysMessage legalPlaysMessage = new UpdateLegalPlaysMessage(heartsGame.getLegalPlays(player));
+                UpdateLegalPlaysMessage legalPlaysMessage = new UpdateLegalPlaysMessage(((HeartsGameState) gameState).getLegalPlays(player));
                 // TODO: I seriously doubt the player name is how spring will be storing this, need to figure that out
                 clientMessenger.convertAndSendToUser(player.getName(), "/hearts/game-room" + gameId + "/legalPlays", legalPlaysMessage);
             }

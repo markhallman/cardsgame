@@ -16,5 +16,5 @@ public abstract class GameController {
     public abstract StartGameRequest createGame(int gameId, RulesConfig rulesConfig, String username);
     public abstract PlayerJoinedMessage joinGame(int gameId, Player.PlayerDescriptor player);
     public abstract PlayCardMessage playCard(int gameId, PlayCardMessage cardMessage);
-    public abstract List<GameState> getActiveGames();
+    public abstract List<GameService> getActiveGames();
 }

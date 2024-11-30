@@ -1,6 +1,7 @@
 package com.markndevon.cardgames.message;
 
 public enum MessageType {
+    ActiveGamesMessage,
     ChatMessage,
     CreatePlayerMessage,
 
