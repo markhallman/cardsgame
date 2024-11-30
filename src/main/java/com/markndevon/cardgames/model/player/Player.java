@@ -1,5 +1,6 @@
 package com.markndevon.cardgames.model.player;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.markndevon.cardgames.logger.Logger;
 import com.markndevon.cardgames.model.Card;
 import com.markndevon.cardgames.model.gamestates.GameState;
@@ -75,6 +76,7 @@ public abstract class Player {
         return new PlayerDescriptor(name, id, isHumanControlled); //todo this is stupid
     }
 
+    @JsonIgnore
     public List<Card> getPassedCards() {
         throw new UnsupportedOperationException();
     }

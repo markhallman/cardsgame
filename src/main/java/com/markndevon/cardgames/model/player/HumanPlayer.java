@@ -1,13 +1,17 @@
 package com.markndevon.cardgames.model.player;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.markndevon.cardgames.model.Card;
 import com.markndevon.cardgames.model.gamestates.GameState;
 
 
 public class HumanPlayer extends Player {
 
+    @JsonIgnore
     private Card selectedCard = null;
+    @JsonIgnore
     private Card cardToPlay = null;
+    @JsonIgnore
     private final Object cardMutex = new Object();
 
     public HumanPlayer(PlayerDescriptor descriptor){
