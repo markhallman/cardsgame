@@ -4,16 +4,20 @@ import com.markndevon.cardgames.logger.Logger;
 import com.markndevon.cardgames.message.*;
 import com.markndevon.cardgames.model.config.HeartsRulesConfig;
 import com.markndevon.cardgames.model.config.RulesConfig;
+import com.markndevon.cardgames.model.gamestates.GameState;
 import com.markndevon.cardgames.model.player.HumanPlayer;
 import com.markndevon.cardgames.model.player.Player;
+import com.markndevon.cardgames.service.GameService;
 import com.markndevon.cardgames.service.GameServiceFactory;
 import com.markndevon.cardgames.service.HeartsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.*;
 import org.springframework.stereotype.Controller;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import static com.markndevon.cardgames.model.gamestates.GameType.HEARTS;
 
@@ -76,6 +80,11 @@ public class HeartsController extends GameController {
         // TODO: Need a way to rebroadcast full gamestate probably, because CPU plays wont broadcast a play message
         getGameService(gameId).playCard(cardMessage);
         return cardMessage;
+    }
+
+    @Override
+    public List<GameState> getActiveGames() {
+        return heartsGameRooms.values().stream().map(GameService::getGameState).collect(Collectors.toList());
     }
 
     /*

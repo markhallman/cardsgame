@@ -4,6 +4,7 @@ import com.markndevon.cardgames.message.CreateGameMessage;
 import com.markndevon.cardgames.message.GameStartMessage;
 import com.markndevon.cardgames.model.config.HeartsRulesConfig;
 import com.markndevon.cardgames.model.config.RulesConfig;
+import com.markndevon.cardgames.model.gamestates.GameState;
 import com.markndevon.cardgames.model.player.HumanPlayer;
 import com.markndevon.cardgames.model.player.Player;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * Universal game manager. Keeps track of all active games and assigns Game IDs for tracking
@@ -48,7 +50,6 @@ public class GamesAPIController {
         String username = authentication != null ? authentication.getName() : "anonymousUser";
 
         RulesConfig rulesConfig = createGameMessage.getRulesConfig();
-        HumanPlayer player = new HumanPlayer(createGameMessage.getCreatingPlayer());
 
         if (gameType.equalsIgnoreCase("HEARTS")){
             if(rulesConfig == null){
@@ -65,11 +66,9 @@ public class GamesAPIController {
 
     // TODO: actually return game list?
     @GetMapping("/games/activegames")
-    public List<GameController> getActiveGames(){
+    public List<GameState> getActiveGames(){
         List<GameController> controllers = new ArrayList<>();
         controllers.add(HEARTS_CONTROLLER);
-        return controllers;
+        return controllers.stream().flatMap(controller -> controller.getActiveGames().stream()).collect(Collectors.toList());
     }
-
-
 }

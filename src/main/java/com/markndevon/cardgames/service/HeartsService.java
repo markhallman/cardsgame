@@ -50,8 +50,8 @@ public class HeartsService extends GameService {
 
     @Override
     public void startGame(){
-        heartsGame = new HeartsGameState(possiblyFillPlayers(), (HeartsRulesConfig) rulesConfig, gameId, logger);
-        heartsGame.start();
+        gameState = new HeartsGameState(possiblyFillPlayers(), (HeartsRulesConfig) rulesConfig, gameId, logger);
+        gameState.start();
         gameIsStarted = true;
         //TODO: Do we need to broadcast a gamestart message?
 

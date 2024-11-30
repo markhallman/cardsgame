@@ -2,6 +2,7 @@ package com.markndevon.cardgames.service;
 
 import com.markndevon.cardgames.logger.Logger;
 import com.markndevon.cardgames.model.config.RulesConfig;
+import com.markndevon.cardgames.model.gamestates.GameState;
 import com.markndevon.cardgames.model.player.Player;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -15,6 +16,8 @@ public abstract class GameService {
     RulesConfig rulesConfig;
     protected final List<Player> players = new ArrayList<>();
 
+    GameState gameState;
+
     public GameService(int gameId, RulesConfig rulesConfig){
         this.gameId = gameId;
         this.rulesConfig = rulesConfig;
@@ -22,6 +25,11 @@ public abstract class GameService {
     }
     public int getGameId() {
         return gameId;
+    }
+
+    public GameState getGameState() {
+        // Will return null if the game has not started yet
+        return gameState;
     }
 
     public RulesConfig getRulesConfig() {

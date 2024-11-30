@@ -41,6 +41,9 @@ public abstract class GameState {
      */
     public abstract boolean isLegal(Player player, Card cardToPlay);
 
+
+    public abstract void start();
+
     public Player.PlayerDescriptor[] getPlayerDescriptors() {
         return playerDescriptors;
     }
