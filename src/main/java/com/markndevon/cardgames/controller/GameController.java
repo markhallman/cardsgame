@@ -5,14 +5,19 @@ import com.markndevon.cardgames.model.config.RulesConfig;
 import com.markndevon.cardgames.model.gamestates.GameState;
 import com.markndevon.cardgames.model.player.Player;
 import com.markndevon.cardgames.service.GameService;
+import com.markndevon.cardgames.service.HeartsService;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /*
     Generic interface for game controller, handles communication from the client to manage the game state
  */
 public abstract class GameController {
+    protected final Map<Integer, GameService> gameRooms = new ConcurrentHashMap<>();
+
     public abstract StartGameRequest createGame(int gameId, RulesConfig rulesConfig, String username);
     public abstract PlayerJoinedMessage joinGame(int gameId, Player.PlayerDescriptor player);
     public abstract PlayCardMessage playCard(int gameId, PlayCardMessage cardMessage);

@@ -30,11 +30,10 @@ import static com.markndevon.cardgames.model.gamestates.GameType.HEARTS;
 public class HeartsController extends GameController {
 
     //TODO: Make sure game removals are handled correctly. Scheduled task to remove inactive games?
-    private final Map<Integer, HeartsService> heartsGameRooms = new ConcurrentHashMap<>();
     @Autowired
     private Logger logger;
 
-    private GameServiceFactory gameServiceFactory;
+    private final GameServiceFactory gameServiceFactory;
 
     public HeartsController(GameServiceFactory gameServiceFactory) {
         this.gameServiceFactory = gameServiceFactory;
@@ -49,7 +48,7 @@ public class HeartsController extends GameController {
         logger.log("username for usee is:  " + username);
         HeartsService heartsService = (HeartsService) gameServiceFactory.createGameService(HEARTS, gameId, heartsRulesConfig);
         heartsService.addPlayer(new HumanPlayer(username, 0)); // Just assigning id 0 is okay here since its the first player
-        heartsGameRooms.put(gameId, heartsService);
+        gameRooms.put(gameId, heartsService);
         //TODO: add the player who created the room
 
         return new StartGameRequest(heartsRulesConfig);
@@ -85,7 +84,7 @@ public class HeartsController extends GameController {
 
     @Override
     public List<GameService> getActiveGames() {
-        return new ArrayList<>(heartsGameRooms.values());
+        return new ArrayList<>(gameRooms.values());
     }
 
     /*
@@ -108,8 +107,19 @@ public class HeartsController extends GameController {
         return chatMessage;
     }
 
+    @MessageMapping("/hearts/game-room/{gameId}/activePlayers")
+    public ActivePlayersMessage getActivePlayers(
+            @DestinationVariable int gameId
+    ) {
+        HeartsService gameService = (HeartsService) gameRooms.get(gameId);
+        return new ActivePlayersMessage(
+                gameService.getPlayers().stream()
+                        .map(Player::getPlayerDescriptor)
+                        .collect(Collectors.toList()));
+    }
+
     protected HeartsService getGameService(int gameId){
-        HeartsService gameService = heartsGameRooms.get(gameId);
+        HeartsService gameService = (HeartsService) gameRooms.get(gameId);
         if (gameService == null) {
             throw new IllegalArgumentException("Game ID " + gameId + " does not exist.");
         }
