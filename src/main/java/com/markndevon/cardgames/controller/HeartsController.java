@@ -63,6 +63,7 @@ public class HeartsController extends GameController {
                 heartsService.getPlayers().stream().map(Player::getPlayerDescriptor).toList().toArray(new Player.PlayerDescriptor[0]));
     }
 
+    //TODO: Does this need to be exposed? All joins should come through the GamesAPIController
     @Override
     @MessageMapping("/hearts/game-room/{gameId}/joinGame")
     public PlayerJoinedMessage joinGame(@DestinationVariable int gameId,
@@ -117,7 +118,6 @@ public class HeartsController extends GameController {
                         .map(Player::getPlayerDescriptor)
                         .collect(Collectors.toList()));
     }
-
     protected HeartsService getGameService(int gameId){
         HeartsService gameService = (HeartsService) gameRooms.get(gameId);
         if (gameService == null) {

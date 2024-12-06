@@ -2,9 +2,11 @@ package com.markndevon.cardgames.controller;
 
 import com.markndevon.cardgames.message.ActiveGamesMessage;
 import com.markndevon.cardgames.message.CreateGameMessage;
+import com.markndevon.cardgames.message.PlayerJoinedMessage;
 import com.markndevon.cardgames.model.config.HeartsRulesConfig;
 import com.markndevon.cardgames.model.config.RulesConfig;
 import com.markndevon.cardgames.model.gamestates.GameState;
+import com.markndevon.cardgames.model.player.Player;
 import com.markndevon.cardgames.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -26,7 +28,7 @@ public class GamesAPIController {
     private HeartsController HEARTS_CONTROLLER;
     // TODO: initial value should be grabbed from database
     // TODO: active games details should be stored in a database so we can retrieve them even if service crashes
-    private static AtomicInteger GAME_ID_CREATOR = new AtomicInteger(1000);
+    private static final AtomicInteger GAME_ID_CREATOR = new AtomicInteger(1000);
 
     @GetMapping("/health")
     public String healthCheck() {
@@ -58,6 +60,15 @@ public class GamesAPIController {
         }
 
         return gameID;
+    }
+
+    @PostMapping("/games/joingame/{gameId}")
+    public PlayerJoinedMessage joinGame(@PathVariable int gameId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication != null ? authentication.getName() : "anonymousUser";
+
+        int playerId = HEARTS_CONTROLLER.getCurrentPlayerIdForGame(gameId);
+        return HEARTS_CONTROLLER.joinGame(gameId, new Player.PlayerDescriptor(username, playerId, true));
     }
 
     @GetMapping("/games/activegames")

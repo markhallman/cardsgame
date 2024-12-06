@@ -22,4 +22,11 @@ public abstract class GameController {
     public abstract PlayerJoinedMessage joinGame(int gameId, Player.PlayerDescriptor player);
     public abstract PlayCardMessage playCard(int gameId, PlayCardMessage cardMessage);
     public abstract List<GameService> getActiveGames();
+
+    public int getCurrentPlayerIdForGame(int gameId) {
+        // TODO: synchronization issues? Might want to use a atomic integer to track id
+        // TODO: Return -1 if the game is full.
+        return gameRooms.get(gameId).getPlayers().size();
+    }
+
 }
