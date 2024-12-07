@@ -5,9 +5,7 @@ import com.markndevon.cardgames.message.CreateGameMessage;
 import com.markndevon.cardgames.message.PlayerJoinedMessage;
 import com.markndevon.cardgames.model.config.HeartsRulesConfig;
 import com.markndevon.cardgames.model.config.RulesConfig;
-import com.markndevon.cardgames.model.gamestates.GameState;
 import com.markndevon.cardgames.model.player.Player;
-import com.markndevon.cardgames.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -67,12 +65,14 @@ public class GamesAPIController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication != null ? authentication.getName() : "anonymousUser";
 
+        //TODO: If the user is already in the game, we should probably reject it
+
         int playerId = HEARTS_CONTROLLER.getCurrentPlayerIdForGame(gameId);
         return HEARTS_CONTROLLER.joinGame(gameId, new Player.PlayerDescriptor(username, playerId, true));
     }
 
     @GetMapping("/games/activegames")
-    public ActiveGamesMessage getActiveGames(){
+    public ActiveGamesMessage getActiveGames() {
         List<GameController> controllers = new ArrayList<>();
         controllers.add(HEARTS_CONTROLLER);
         return new ActiveGamesMessage(controllers
