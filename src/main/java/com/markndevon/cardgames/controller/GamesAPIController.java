@@ -71,6 +71,9 @@ public class GamesAPIController {
         return HEARTS_CONTROLLER.joinGame(gameId, new Player.PlayerDescriptor(username, playerId, true));
     }
 
+    @PostMapping("/games/startgame/{gameId}")
+
+
     @GetMapping("/games/activegames")
     public ActiveGamesMessage getActiveGames() {
         List<GameController> controllers = new ArrayList<>();
