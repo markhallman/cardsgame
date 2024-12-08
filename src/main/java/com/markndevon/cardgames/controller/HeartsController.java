@@ -56,7 +56,7 @@ public class HeartsController extends GameController {
                                        RulesConfig heartsRulesConfig,
                                        @Header("username") String username) {
         logger.log("Creating game with ID " + gameId);
-        logger.log("username for usee is:  " + username);
+        logger.log("username for user is:  " + username);
         HeartsService heartsService = (HeartsService) gameServiceFactory.createGameService(HEARTS, gameId, heartsRulesConfig);
         heartsService.addPlayer(new HumanPlayer(username, 0)); // Just assigning id 0 is okay here since its the first player
         gameRooms.put(gameId, heartsService);
