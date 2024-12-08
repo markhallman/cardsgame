@@ -35,7 +35,7 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        // In memory user athentication, really we want this to be backed by a database of users
+        // In memory user authentication, really we want this to be backed by a database of users
         UserDetails user = User.builder()
                 .username("user")
                 .password(passwordEncoder().encode("password"))

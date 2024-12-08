@@ -84,6 +84,7 @@ public class HeartsGameState extends GameState {
         return currentTrickMap;
     }
 
+    public Player getCurrentPlayer() { return currentPlayer; }
     public int getCurrentPlayerID() {
         return currentPlayer.getId();
     }

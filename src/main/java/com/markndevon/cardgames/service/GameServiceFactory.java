@@ -9,6 +9,9 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
+/**
+ * Factory class for creating a game service
+ */
 @Component
 public class GameServiceFactory {
 

@@ -5,6 +5,7 @@ import com.markndevon.cardgames.message.*;
 import com.markndevon.cardgames.model.config.HeartsRulesConfig;
 import com.markndevon.cardgames.model.config.RulesConfig;
 import com.markndevon.cardgames.model.gamestates.GameState;
+import com.markndevon.cardgames.model.gamestates.HeartsGameState;
 import com.markndevon.cardgames.model.player.HumanPlayer;
 import com.markndevon.cardgames.model.player.Player;
 import com.markndevon.cardgames.service.GameService;
@@ -22,9 +23,10 @@ import java.util.stream.Collectors;
 
 import static com.markndevon.cardgames.model.gamestates.GameType.HEARTS;
 
-/*
-    Controller for a game of Hearts
-    // TODO: a chunk of this can probably be moved to the parent abstract class
+/**
+ * Controller class for a game of hearts
+ *
+ * //TODO: We should move whatever we can to the parent GameController class so logic can be reused
  */
 @Controller
 public class HeartsController extends GameController {
@@ -39,6 +41,15 @@ public class HeartsController extends GameController {
         this.gameServiceFactory = gameServiceFactory;
     }
 
+    /**
+     * This method is called by the controller when a client submits a REST API request to start a game
+     * return value is broadcasted to all listening clients
+     *
+     * @param gameId game identification value
+     * @param heartsRulesConfig rules configuration for the game being created.
+     * @param username username of the user creating the game. Should be given control by default
+     * @return StartGameRequest containing the initial set of rules the game was created with. Subject to change
+     */
     @Override
     @SendTo("/topic/hearts/game-room")
     public StartGameRequest createGame(int gameId,
@@ -54,6 +65,13 @@ public class HeartsController extends GameController {
         return new StartGameRequest(heartsRulesConfig);
     }
 
+    /**
+     * Method called by a client from the lobby when they want to actually start the game, idetified through gameId in
+     * the message path
+     *
+     * @param gameId game identification value
+     * @return GameStartMessage indicating the rules for the game and a list of players participating
+     */
     @MessageMapping("/hearts/game-room/{gameId}/startGame")
     public GameStartMessage startGame(@DestinationVariable int gameId) {
         logger.log("Starting game with ID " + gameId);
@@ -63,6 +81,16 @@ public class HeartsController extends GameController {
                 heartsService.getPlayers().stream().map(Player::getPlayerDescriptor).toList().toArray(new Player.PlayerDescriptor[0]));
     }
 
+    /**
+     * Method called by a client from the list of active games when they wish to join a game
+     * CURRENTLY NO WAY TO PASSWORD PROTECT A GAME, ANYONE CAN JOIN ANY GAME
+     *
+     * TODO: Fix this
+     *
+     * @param gameId game identification value
+     * @param playerJoined player descriptor of the joining player, to be added to the game state
+     * @return PlayerJoinedMessage with the details of the joining player and the gameId of the game they have joined
+     */
     //TODO: Does this need to be exposed? All joins should come through the GamesAPIController
     @Override
     @MessageMapping("/hearts/game-room/{gameId}/joinGame")
@@ -73,16 +101,36 @@ public class HeartsController extends GameController {
         return new PlayerJoinedMessage(playerToAdd, gameId);
     }
 
+    /**
+     * Method called by a client playing a card in a game of hearts.
+     *
+     * @param gameId game identification value
+     * @param cardMessage  PlayCardMessage identifying the card being played and the player who is playing it
+     * @return PlayCardMessage identifying the card played and the player who played it
+     */
     @Override
     @MessageMapping("/hearts/game-room/{gameId}/playCard")
     public PlayCardMessage playCard(
             @DestinationVariable int gameId,
-            @Payload PlayCardMessage cardMessage){
-        // TODO: Need a way to rebroadcast full gamestate probably, because CPU plays wont broadcast a play message
-        getGameService(gameId).playCard(cardMessage);
-        return cardMessage;
+            @Payload PlayCardMessage cardMessage,
+            @Header("username") String username) throws IllegalAccessException {
+        HeartsService heartsService = getGameService(gameId);
+        HeartsGameState currGameSate = (HeartsGameState) heartsService.getGameState();
+
+        // TODO: Not sure if this is the ideal way to validate a user, username in header can be faked.
+        if (currGameSate.getCurrentPlayer().getName().equals(username)) {
+            heartsService.playCard(cardMessage);
+            return cardMessage;
+        }
+
+        throw new IllegalAccessException("It is not the turn of player " + username);
     }
 
+    /**
+     * Get a list of active games being  managed by this controller
+     *
+     * @return List of GameService objects being managed by the controller
+     */
     @Override
     public List<GameService> getActiveGames() {
         return new ArrayList<>(gameRooms.values());
@@ -101,6 +149,13 @@ public class HeartsController extends GameController {
     */
 
 
+    /**
+     * Method called by the client when sending a chat message. Rebroadcast to all clients listeing on the channel
+     *
+     * @param gameId game identification value
+     * @param chatMessage message detailing the message contents and the message sender
+     * @return
+     */
     @MessageMapping("/hearts/game-room/{gameId}/chat")
     public ChatMessage chatMessage(
             @DestinationVariable int gameId,
@@ -108,6 +163,12 @@ public class HeartsController extends GameController {
         return chatMessage;
     }
 
+    /**
+     * Method allowing a client to request the current set of active players in a game
+     *
+     * @param gameId game identification value
+     * @return ActivePlayersMessage with a list of active game players
+     */
     @MessageMapping("/hearts/game-room/{gameId}/activePlayers")
     public ActivePlayersMessage getActivePlayers(
             @DestinationVariable int gameId
@@ -118,6 +179,14 @@ public class HeartsController extends GameController {
                         .map(Player::getPlayerDescriptor)
                         .collect(Collectors.toList()));
     }
+
+    /**
+     * Get the HeartsService associated with a given gameId. Each GameState has a separate
+     * GameService object to manage it
+     *
+     * @param gameId game identification value
+     * @return The HeartsService object associated with the given ID
+     */
     protected HeartsService getGameService(int gameId){
         HeartsService gameService = (HeartsService) gameRooms.get(gameId);
         if (gameService == null) {

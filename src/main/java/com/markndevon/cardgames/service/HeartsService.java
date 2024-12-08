@@ -10,6 +10,9 @@ import com.markndevon.cardgames.model.player.Player;
 import com.markndevon.cardgames.model.player.RandomAIPlayer;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
+/**
+ * Service object for managing a game of hearts
+ */
 public class HeartsService extends GameService {
     @JsonIgnore
     private SimpMessagingTemplate clientMessenger;
@@ -24,6 +27,13 @@ public class HeartsService extends GameService {
         this.logger = logger;
 
     }
+
+    /**
+     * Method triggered from the controller when a player is playing a card. Essentially just triggers the play card
+     * message in the game state
+     *
+     * @param playCard message detailing card being played and by who
+     */
     public void playCard(PlayCardMessage playCard){
         if(gameIsStarted){
             ((HeartsGameState) gameState).playCard(new HumanPlayer(playCard.getPlayerDescriptor()), playCard.getCard());
@@ -41,6 +51,13 @@ public class HeartsService extends GameService {
     }
 */
 
+    /**
+     * Service method for actually starting the game of hearts. Fills in any unoccupied spots in the game with
+     * Computer players, triggers teh start method of the GameState, and communicates initial game state to all
+     * the clients
+     *
+     * TODO: Should probably communicate FULL game state instead of having a deal message/legal plays message
+     */
     @Override
     public void startGame(){
         gameState = new HeartsGameState(possiblyFillPlayers(), (HeartsRulesConfig) rulesConfig, gameId, logger);
@@ -65,6 +82,11 @@ public class HeartsService extends GameService {
         updateClients();
     }
 
+    /**
+     * Method for updating the clients playing this particular game with the latest game state
+     *
+     * TODO: Actually communicate full game state instead of individual parts
+     */
     @Override
     public void updateClients(){
         UpdateCurrentTrickMessage currentTrickMessage = new UpdateCurrentTrickMessage(((HeartsGameState) gameState).getCurrentTrickMap());
@@ -83,6 +105,11 @@ public class HeartsService extends GameService {
         }
     }
 
+    /**
+     * Utility method for filling out a gameState with CPU players
+     *
+     * @return player array updated with CPU players
+     */
     private Player[] possiblyFillPlayers() {
         int size = getPlayers().size();
 

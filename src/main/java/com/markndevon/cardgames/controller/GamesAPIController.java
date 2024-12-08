@@ -35,6 +35,7 @@ public class GamesAPIController {
 
     /**
      * Method for creating a new game
+     *
      * @param gameType the name of the game that is being played
      * @return the game ID of the newly created game
      */
@@ -60,6 +61,12 @@ public class GamesAPIController {
         return gameID;
     }
 
+    /**
+     * Method called by a client joining a new game
+     *
+     * @param gameId game identification value
+     * @return PlayerJoinedMessage with the descriptor of the player joining and the game identification value
+     */
     @PostMapping("/games/joingame/{gameId}")
     public PlayerJoinedMessage joinGame(@PathVariable int gameId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -71,9 +78,12 @@ public class GamesAPIController {
         return HEARTS_CONTROLLER.joinGame(gameId, new Player.PlayerDescriptor(username, playerId, true));
     }
 
-    @PostMapping("/games/startgame/{gameId}")
-
-
+    /**
+     * API method for getting a list of ALL currently active games. Goes through all the different controller beans
+     * and returns each of the games they are managing
+     *
+     * @return message detailing the list of currently active games
+     */
     @GetMapping("/games/activegames")
     public ActiveGamesMessage getActiveGames() {
         List<GameController> controllers = new ArrayList<>();
