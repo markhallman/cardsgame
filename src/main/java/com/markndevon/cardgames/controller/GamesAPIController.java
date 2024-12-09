@@ -2,6 +2,7 @@ package com.markndevon.cardgames.controller;
 
 import com.markndevon.cardgames.message.ActiveGamesMessage;
 import com.markndevon.cardgames.message.CreateGameMessage;
+import com.markndevon.cardgames.message.GameStartMessage;
 import com.markndevon.cardgames.message.PlayerJoinedMessage;
 import com.markndevon.cardgames.model.config.HeartsRulesConfig;
 import com.markndevon.cardgames.model.config.RulesConfig;
@@ -61,6 +62,12 @@ public class GamesAPIController {
         return gameID;
     }
 
+    @PostMapping("games/startgame/{gameId}")
+    public GameStartMessage startGame(@PathVariable int gameId){
+        // TODO Do some user authentication to make sure this user is allowed to start this game
+        return HEARTS_CONTROLLER.startGame(gameId);
+    }
+
     /**
      * Method called by a client joining a new game
      *
@@ -73,6 +80,7 @@ public class GamesAPIController {
         String username = authentication != null ? authentication.getName() : "anonymousUser";
 
         //TODO: If the user is already in the game, we should probably reject it
+        //HEARTS_CONTROLLER.getGameService(gameId).getPlayers()
 
         int playerId = HEARTS_CONTROLLER.getCurrentPlayerIdForGame(gameId);
         return HEARTS_CONTROLLER.joinGame(gameId, new Player.PlayerDescriptor(username, playerId, true));
