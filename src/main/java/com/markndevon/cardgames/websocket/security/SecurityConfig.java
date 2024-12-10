@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -21,10 +22,11 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults()) // Set up CORS TODO: Finish configuration
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/ws/**").authenticated() // Allow ws endpoints (for now, lock down later)
+                        .requestMatchers("/ws/**").permitAll() // Allow ws endpoints (for now, lock down later)
                         .anyRequest().authenticated()              // Secure everything else
-                ).httpBasic(httpBasic -> {}); // Basic Auth (JWT is recommended for production)
-
+                ).httpBasic(httpBasic -> {})         // Basic Auth (JWT is recommended for production)
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS));
         return http.build();
     }
 
