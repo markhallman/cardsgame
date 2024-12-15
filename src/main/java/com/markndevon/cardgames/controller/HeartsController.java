@@ -42,7 +42,7 @@ public class HeartsController extends GameController {
     }
 
     /**
-     * This method is called by the controller when a client submits a REST API request to start a game
+     * This method is called by the controller when a client submits a REST API reuest to start a game
      * return value is broadcasted to all listening clients
      *
      * @param gameId game identification value
@@ -110,7 +110,7 @@ public class HeartsController extends GameController {
      */
     @Override
     @MessageMapping("/hearts/game-room/{gameId}/playCard")
-    public PlayCardMessage playCard(
+    public GameUpdateMessage playCard(
             @DestinationVariable int gameId,
             @Payload PlayCardMessage cardMessage,
             @Header("username") String username) throws IllegalAccessException {
@@ -120,7 +120,7 @@ public class HeartsController extends GameController {
         // TODO: Not sure if this is the ideal way to validate a user, username in header can be faked.
         if (currGameSate.getCurrentPlayer().getName().equals(username)) {
             heartsService.playCard(cardMessage);
-            return cardMessage;
+            return new GameUpdateMessage(heartsService.getGameState());
         }
 
         throw new IllegalAccessException("It is not the turn of player " + username);
@@ -178,6 +178,17 @@ public class HeartsController extends GameController {
                 gameService.getPlayers().stream()
                         .map(Player::getPlayerDescriptor)
                         .collect(Collectors.toList()));
+    }
+
+    /**
+     * Method for getting the current state of a hearts game based on the game identification code
+     *
+     * @return GameUpdateMessage represting the current full state of the game
+     */
+    @MessageMapping("/hearts/game-room/{gameId}/gameState")
+    public GameUpdateMessage getGameState(@DestinationVariable int gameId){
+        System.out.println("Sending out updated game state for game " + gameId);
+        return new GameUpdateMessage(gameRooms.get(gameId).getGameState());
     }
 
     /**

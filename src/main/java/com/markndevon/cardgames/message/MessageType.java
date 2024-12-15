@@ -10,6 +10,7 @@ public enum MessageType {
     PlayerJoinedMessage,
     KittyMessage,
     GameStartedMessage, //server informs the client the game has started
+    GameUpdateMessage,
     StartGameRequest, //client requests the server starts the game
     DealMessage,
     PlayCardMessage,

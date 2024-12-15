@@ -39,6 +39,7 @@ public class HeartsService extends GameService {
             ((HeartsGameState) gameState).playCard(new HumanPlayer(playCard.getPlayerDescriptor()), playCard.getCard());
             updateClients();
         } else {
+            logger.log("Game not started, cannot play card");
             // TODO: error handling
         }
 
@@ -63,21 +64,8 @@ public class HeartsService extends GameService {
         gameState = new HeartsGameState(possiblyFillPlayers(), (HeartsRulesConfig) rulesConfig, gameId, logger);
         gameState.start();
         gameIsStarted = true;
-        //TODO: Do we need to broadcast a gamestart message?
 
-        // When we start the game, need to deal the cards and init the kitty
-        for(Player player : ((HeartsGameState) gameState).getPlayers()) {
-            if(player.isHumanControlled()){
-                DealMessage dealMessage = new DealMessage(player.getHand());
-                UpdateLegalPlaysMessage legalPlaysMessage = new UpdateLegalPlaysMessage(((HeartsGameState) gameState).getLegalPlays(player));
-                // TODO: I seriously doubt the player name is how spring will be storing this, need to figure that out
-                // TODO: Repeated code section with updateClients
-
-                System.out.println(player.getName());
-                clientMessenger.convertAndSendToUser(player.getName(), "/hearts/game-room/" + gameId + "/deal", dealMessage);
-                clientMessenger.convertAndSendToUser(player.getName(), "/hearts/game-room/" + gameId + "/legalPlays", legalPlaysMessage);
-            }
-        }
+        logger.log("Broadcasting starting state");
 
         updateClients();
     }
@@ -85,24 +73,14 @@ public class HeartsService extends GameService {
     /**
      * Method for updating the clients playing this particular game with the latest game state
      *
-     * TODO: Actually communicate full game state instead of individual parts
+     * TODO: so users cant see other users hands, we will NEED to filter the game state somehow
+     *  at some point and send separate messages
      */
     @Override
     public void updateClients(){
-        UpdateCurrentTrickMessage currentTrickMessage = new UpdateCurrentTrickMessage(((HeartsGameState) gameState).getCurrentTrickMap());
-        clientMessenger.convertAndSend("/hearts/game-room/" + gameId + "/currentTrick", currentTrickMessage);
-
-        UpdateScoreBoardMessage scoreBoardMessage = new UpdateScoreBoardMessage(((HeartsGameState) gameState).getScoreBoard().getScore());
-        clientMessenger.convertAndSend("/hearts/game-room/" + gameId + "/updateScore", scoreBoardMessage);
-
-        // Send the legal plays individually to each player
-        for(Player player : ((HeartsGameState) gameState).getPlayers()) {
-            if(player.isHumanControlled()){
-                UpdateLegalPlaysMessage legalPlaysMessage = new UpdateLegalPlaysMessage(((HeartsGameState) gameState).getLegalPlays(player));
-                // TODO: I seriously doubt the player name is how spring will be storing this, need to figure that out
-                clientMessenger.convertAndSendToUser(player.getName(), "/hearts/game-room" + gameId + "/legalPlays", legalPlaysMessage);
-            }
-        }
+        logger.log("Broadcasting current game state to all clients");
+        GameUpdateMessage currGameStateMessage = new GameUpdateMessage(gameState);
+        clientMessenger.convertAndSend("/hearts/game-room/" + gameId + "", currGameStateMessage);
     }
 
     /**

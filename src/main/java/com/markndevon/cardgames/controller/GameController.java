@@ -20,7 +20,7 @@ public abstract class GameController {
 
     public abstract StartGameRequest createGame(int gameId, RulesConfig rulesConfig, String username);
     public abstract PlayerJoinedMessage joinGame(int gameId, Player.PlayerDescriptor player);
-    public abstract PlayCardMessage playCard(int gameId, PlayCardMessage cardMessage, String username) throws IllegalAccessException;
+    public abstract GameUpdateMessage playCard(int gameId, PlayCardMessage cardMessage, String username) throws IllegalAccessException;
     public abstract List<GameService> getActiveGames();
 
     public int getCurrentPlayerIdForGame(int gameId) {
