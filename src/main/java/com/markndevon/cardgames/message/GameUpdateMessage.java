@@ -3,7 +3,7 @@ package com.markndevon.cardgames.message;
 import com.markndevon.cardgames.model.gamestates.GameState;
 
 public class GameUpdateMessage extends Message {
-    final GameState currentGameState;
+    private final GameState currentGameState;
 
     public GameUpdateMessage(final GameState gameState) {
         this.currentGameState = gameState;
@@ -11,7 +11,11 @@ public class GameUpdateMessage extends Message {
 
     @Override
     public MessageType getMessageType() {
-        return MessageType.GameStartedMessage;
+        return MessageType.GameUpdateMessage;
+    }
+
+    public GameState getCurrentGameState() {
+        return currentGameState;
     }
 
 }

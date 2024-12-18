@@ -198,7 +198,7 @@ public class HeartsController extends GameController {
      * @param gameId game identification value
      * @return The HeartsService object associated with the given ID
      */
-    protected HeartsService getGameService(int gameId){
+    public HeartsService getGameService(int gameId){
         HeartsService gameService = (HeartsService) gameRooms.get(gameId);
         if (gameService == null) {
             throw new IllegalArgumentException("Game ID " + gameId + " does not exist.");
