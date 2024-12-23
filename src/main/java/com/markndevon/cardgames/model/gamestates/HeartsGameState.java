@@ -176,10 +176,6 @@ public class HeartsGameState extends GameState {
         if(!player.equals(currentPlayer) || !isLegal(currentPlayer, card)) {
             return false;
         }
-
-        PlayCardMessage test = new PlayCardMessage(player.getPlayerDescriptor(), card);
-        test.debugSerialization();
-
         logger.log("Player " + player + " playing card " + card);
 
         currentPlayer.removeCard(card);
@@ -197,7 +193,8 @@ public class HeartsGameState extends GameState {
 
         // If the next player id a CPU, resolve their action as well
         if(!currentPlayer.isHumanControlled()){
-            // Need a way to rebroadcast syaye
+            // TODO: would like some way to signal the client to update after each CPU play and pause so the
+            //  computer plays dont just all appear at once
             playCard(currentPlayer, currentPlayer.getNextPlay(this));
         }
 

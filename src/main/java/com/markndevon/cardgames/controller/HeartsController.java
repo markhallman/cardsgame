@@ -113,7 +113,11 @@ public class HeartsController extends GameController {
     public GameUpdateMessage playCard(
             @DestinationVariable int gameId,
             @Payload PlayCardMessage cardMessage,
-            @Header("username") String username) throws IllegalAccessException {
+            @Header("user-name") String username) throws IllegalAccessException {
+        logger.log("FUllMessage: " + cardMessage.toString());
+        logger.log("PlayCard message received for game " + gameId + " from player " + username + " with card " + cardMessage.getCard());
+        logger.log("PlayCard other stuff " + cardMessage.getPlayerName() + " " + cardMessage.getMessageType() );
+
         HeartsService heartsService = getGameService(gameId);
         HeartsGameState currGameSate = (HeartsGameState) heartsService.getGameState();
 

@@ -117,6 +117,15 @@ public abstract class Player {
             return "Player --- name: " + this.name + " ID: " + this.id + " isHumanControlled: " + this.isHumanControlled;
         }
 
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public boolean isHumanControlled() {
+            return isHumanControlled;
+        }
+
         @Override
         public int hashCode() {
             return Objects.hash(id);

@@ -5,10 +5,10 @@ import com.markndevon.cardgames.model.player.Player;
 
 public class PlayCardMessage extends Message {
 
-    private final Player.PlayerDescriptor playerDescriptor;
+    private final String playerName;
     private final Card card;
-    public PlayCardMessage(final Player.PlayerDescriptor player, final Card card) {
-        this.playerDescriptor = player;
+    public PlayCardMessage(final String player, final Card card) {
+        this.playerName = player;
         this.card = card;
     }
 
@@ -16,8 +16,8 @@ public class PlayCardMessage extends Message {
         return card;
     }
 
-    public Player.PlayerDescriptor getPlayerDescriptor() {
-        return playerDescriptor;
+    public String getPlayerName() {
+        return playerName;
     }
 
     @Override

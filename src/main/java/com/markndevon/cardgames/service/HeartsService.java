@@ -3,6 +3,7 @@ package com.markndevon.cardgames.service;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.markndevon.cardgames.logger.Logger;
 import com.markndevon.cardgames.message.*;
+import com.markndevon.cardgames.model.Card;
 import com.markndevon.cardgames.model.config.HeartsRulesConfig;
 import com.markndevon.cardgames.model.gamestates.HeartsGameState;
 import com.markndevon.cardgames.model.player.HumanPlayer;
@@ -36,7 +37,12 @@ public class HeartsService extends GameService {
      */
     public void playCard(PlayCardMessage playCard){
         if(gameIsStarted){
-            ((HeartsGameState) gameState).playCard(new HumanPlayer(playCard.getPlayerDescriptor()), playCard.getCard());
+            HumanPlayer playingPlayer = getPlayers().stream().filter(player -> player.getName().equals(playCard.getPlayerName())).map(player -> (HumanPlayer) player).findFirst().orElse(null);
+            if(playingPlayer == null){
+                throw new RuntimeException("Player " + playCard.getPlayerName() + " not found in game");
+            }
+
+            ((HeartsGameState) gameState).playCard(playingPlayer, playCard.getCard());
             updateClients();
         } else {
             logger.log("Game not started, cannot play card");
@@ -65,6 +71,10 @@ public class HeartsService extends GameService {
         gameState.start();
         gameIsStarted = true;
 
+        PlayCardMessage testMessage = new PlayCardMessage("User", new Card(Card.Suit.CLUB, Card.Value.ACE));
+        logger.log("Test playCard Message: ");
+        testMessage.debugSerialization();
+
         logger.log("Broadcasting starting state");
 
         updateClients();
@@ -80,7 +90,7 @@ public class HeartsService extends GameService {
     public void updateClients(){
         logger.log("Broadcasting current game state to all clients");
         GameUpdateMessage currGameStateMessage = new GameUpdateMessage(gameState);
-        clientMessenger.convertAndSend("/hearts/game-room/" + gameId + "", currGameStateMessage);
+        clientMessenger.convertAndSend("/topic/hearts/game-room/" + gameId + "", currGameStateMessage);
     }
 
     /**
