@@ -20,6 +20,9 @@ public class HeartsService extends GameService {
     @JsonIgnore
     private Logger logger;
 
+    @JsonIgnore
+    private static long CPU_TURN_SLEEP_TIME = 1000L;
+
 
     // TODO: Need to take in an initial playerID? Or just initialize a null list of players? GameState should probably track that
     public HeartsService(int gameId, HeartsRulesConfig rulesConfig, SimpMessagingTemplate clientMessenger, Logger logger){
@@ -42,8 +45,22 @@ public class HeartsService extends GameService {
                 throw new RuntimeException("Player " + playCard.getPlayerName() + " not found in game");
             }
 
-            ((HeartsGameState) gameState).playCard(playingPlayer, playCard.getCard());
+            HeartsGameState currGameState = (HeartsGameState) gameState;
+
+            // TODO: Refactor some repeat code here?
+            currGameState.playCard(playingPlayer, playCard.getCard());
             updateClients();
+
+            try {
+                Thread.sleep(CPU_TURN_SLEEP_TIME);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            ((HeartsGameState)getGameState()).possiblyResolveTrick();
+            ((HeartsGameState)getGameState()).possiblyResolveHand();
+            updateClients(); // Should send an updated game state after hand/trick resolution as well
+
+            playCPUTurns();
         } else {
             logger.log("Game not started, cannot play card");
             // TODO: error handling
@@ -71,13 +88,39 @@ public class HeartsService extends GameService {
         gameState.start();
         gameIsStarted = true;
 
-        PlayCardMessage testMessage = new PlayCardMessage("User", new Card(Card.Suit.CLUB, Card.Value.ACE));
-        logger.log("Test playCard Message: ");
-        testMessage.debugSerialization();
-
         logger.log("Broadcasting starting state");
 
         updateClients();
+
+        playCPUTurns();
+    }
+
+    /**
+     * Convenience method for playing CPU turns in the game
+     *
+     * // TODO: Some repeated code with the playCard method, should probably refactor
+     */
+    private void playCPUTurns(){
+        // If the next player is a CPU, resolve their action as well
+        HeartsGameState currGameState = (HeartsGameState) gameState;
+
+        Player currPlayer = currGameState.getCurrentPlayer();
+        while(!currPlayer.isHumanControlled()){
+            currGameState.playCard(currPlayer, currPlayer.getNextPlay(getGameState()));
+            updateClients();
+            try {
+                Thread.sleep(CPU_TURN_SLEEP_TIME);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            // This should be controlled from the service, so the game has a chance to update before trick is resovled
+            ((HeartsGameState)getGameState()).possiblyResolveTrick();
+            ((HeartsGameState)getGameState()).possiblyResolveHand();
+            updateClients(); // Should send an updated game state after hand/trick resolution as well
+
+            currPlayer = ((HeartsGameState)getGameState()).getCurrentPlayer();
+        }
     }
 
     /**

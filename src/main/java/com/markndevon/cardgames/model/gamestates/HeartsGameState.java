@@ -188,16 +188,6 @@ public class HeartsGameState extends GameState {
 
         dumpGameInfo();
 
-        possiblyResolveTrick();
-        possiblyResolveHand();
-
-        // If the next player id a CPU, resolve their action as well
-        if(!currentPlayer.isHumanControlled()){
-            // TODO: would like some way to signal the client to update after each CPU play and pause so the
-            //  computer plays dont just all appear at once
-            playCard(currentPlayer, currentPlayer.getNextPlay(this));
-        }
-
         return true;
     }
 
@@ -211,7 +201,7 @@ public class HeartsGameState extends GameState {
         return cards;
     }
 
-    private void possiblyResolveTrick() {
+    public void possiblyResolveTrick() {
         if(currentTrick.size() == players.length) {
             logger.log("Trick finished, resolving. All cards played=" + currentTrick);
 
@@ -250,7 +240,7 @@ public class HeartsGameState extends GameState {
             playerWhoTookTheKitty = currentPlayer;
         }
     }
-    private void possiblyResolveHand() {
+    public void possiblyResolveHand() {
         if(Arrays.stream(players).allMatch(player -> player.getHand().isEmpty())) {
             logger.log("Hand finished, resolving.");
             updateScoreBoardAtHandEnd();
