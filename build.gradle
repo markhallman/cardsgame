@@ -26,6 +26,10 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework:spring-messaging'                   // For Spring Messaging support
 	//implementation 'org.springframework.messaging:spring-messaging' // TODO: Not necessary?
+
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	runtimeOnly 'org.postgresql:postgresql' // PostgreSQL JDBC driver
 }
 
 tasks.named('test') {

@@ -1,9 +1,13 @@
 package com.markndevon.cardgames.websocket.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
@@ -15,18 +19,21 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
+    @Autowired
+    private UserDetailsService userDetailsService;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(Customizer.withDefaults()) // Set up CORS TODO: Finish configuration
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/ws/**").permitAll() // Allow ws endpoints (for now, lock down later)
-                        .anyRequest().authenticated()              // Secure everything else
-                ).httpBasic(httpBasic -> {})         // Basic Auth (JWT is recommended for production)
+                .cors(Customizer.withDefaults()) // Set up CORS TODO: Finish configuration, only one domain so shouldnt need to be wide open
+                .authorizeHttpRequests(request -> request
+                        .requestMatchers("/login").permitAll() // Allow login and ws endpoints
+                        .anyRequest().authenticated()              // Secure everything
+                ).httpBasic(Customizer.withDefaults())         // Basic Auth (JWT is recommended for production)
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS));
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         return http.build();
     }
 
@@ -36,6 +43,14 @@ public class SecurityConfig {
     }
 
     @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(passwordEncoder());
+        provider.setUserDetailsService(userDetailsService);
+        return provider;
+    }
+
+    /*
+    @Bean
     public UserDetailsService userDetailsService() {
         // In memory user authentication, really we want this to be backed by a database of users
         UserDetails user = User.builder()
@@ -44,6 +59,26 @@ public class SecurityConfig {
                 .roles("PLAYER")
                 .build();
 
-        return new InMemoryUserDetailsManager(user);
+        UserDetails devon = User.builder()
+                .username("devon")
+                .password(passwordEncoder().encode("markIzCool"))
+                .roles("PLAYER")
+                .build();
+
+        UserDetails tom = User.builder()
+                .username("tom")
+                .password(passwordEncoder().encode("markIzCooler"))
+                .roles("PLAYER")
+                .build();
+
+
+        UserDetails kyle = User.builder()
+                .username("kyle")
+                .password(passwordEncoder().encode("markIzCoolest"))
+                .roles("PLAYER")
+                .build();
+
+        return new InMemoryUserDetailsManager(user, devon, tom, kyle);
     }
+     */
 }
