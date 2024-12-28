@@ -1,5 +1,6 @@
 package com.markndevon.cardgames.controller;
 
+import com.markndevon.cardgames.logger.Logger;
 import com.markndevon.cardgames.model.CardGameUser;
 import com.markndevon.cardgames.service.CardsUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +14,17 @@ public class UserController {
     @Autowired
     private CardsUserService userService;
 
+    @Autowired
+    private final Logger logger = Logger.getInstance();
+
     @PostMapping("/register")
     public CardGameUser register(@RequestBody CardGameUser user){
         return userService.register(user);
+    }
+
+    @PostMapping("/login")
+    public String login(@RequestBody CardGameUser user){
+        logger.log(user.toString());
+        return userService.verify(user);
     }
 }
