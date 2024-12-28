@@ -3,7 +3,7 @@ package com.markndevon.cardgames.model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 @Entity
-public class Users {
+public class CardGameUser {
     @Id
     public int id;
 

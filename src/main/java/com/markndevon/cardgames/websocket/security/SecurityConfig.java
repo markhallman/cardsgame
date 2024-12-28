@@ -42,8 +42,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        // TODO: Switch to bcrypt password encoding
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(NoOpPasswordEncoder.getInstance());
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(passwordEncoder());
         provider.setUserDetailsService(userDetailsService);
         return provider;
     }
