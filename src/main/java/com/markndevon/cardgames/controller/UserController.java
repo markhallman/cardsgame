@@ -1,8 +1,8 @@
 package com.markndevon.cardgames.controller;
 
 import com.markndevon.cardgames.logger.Logger;
-import com.markndevon.cardgames.model.CardGameUser;
-import com.markndevon.cardgames.service.CardsUserService;
+import com.markndevon.cardgames.model.authentication.CardGameUser;
+import com.markndevon.cardgames.service.authentication.CardsUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

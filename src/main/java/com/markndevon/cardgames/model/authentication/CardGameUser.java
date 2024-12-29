@@ -1,4 +1,4 @@
-package com.markndevon.cardgames.model;
+package com.markndevon.cardgames.model.authentication;
 
 import jakarta.persistence.*;
 

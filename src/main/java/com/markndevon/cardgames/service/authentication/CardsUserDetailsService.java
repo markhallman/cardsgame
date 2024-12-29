@@ -1,7 +1,7 @@
-package com.markndevon.cardgames.service;
+package com.markndevon.cardgames.service.authentication;
 
-import com.markndevon.cardgames.model.CardGameUser;
-import com.markndevon.cardgames.model.UserPrincipal;
+import com.markndevon.cardgames.model.authentication.CardGameUser;
+import com.markndevon.cardgames.model.authentication.UserPrincipal;
 import com.markndevon.cardgames.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

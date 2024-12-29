@@ -1,7 +1,7 @@
-package com.markndevon.cardgames.service;
+package com.markndevon.cardgames.service.authentication;
 
 import com.markndevon.cardgames.logger.Logger;
-import com.markndevon.cardgames.model.CardGameUser;
+import com.markndevon.cardgames.model.authentication.CardGameUser;
 import com.markndevon.cardgames.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,6 +22,9 @@ public class CardsUserService {
     @Autowired
     private Logger logger;
 
+    @Autowired
+    private JWTService jwtService;
+
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
     public CardGameUser register(CardGameUser user) {
@@ -36,7 +39,7 @@ public class CardsUserService {
         );
 
         if(authentication.isAuthenticated()){
-            return "Login successful";
+            return jwtService.generateJWTToken(user.getUsername(), user.getPassword());
         }
         return "Login failed";
     }

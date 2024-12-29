@@ -1,4 +1,4 @@
-package com.markndevon.cardgames.model;
+package com.markndevon.cardgames.model.authentication;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
