@@ -3,7 +3,10 @@ package com.markndevon.cardgames.websocket.config;
 import com.markndevon.cardgames.controller.HeartsController;
 import com.markndevon.cardgames.message.GameUpdateMessage;
 import com.markndevon.cardgames.model.gamestates.HeartsGameState;
+import com.markndevon.cardgames.service.authentication.CardsUserDetailsService;
+import com.markndevon.cardgames.service.authentication.JWTService;
 import com.markndevon.cardgames.websocket.WebSocketUserIdentifier;
+import com.markndevon.cardgames.websocket.security.JwtHandshakeInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -29,17 +32,23 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Autowired
     @Lazy
-    HeartsController heartsController;
+    private HeartsController heartsController;
 
     @Autowired
     @Lazy
-    SimpMessagingTemplate simpMessagingTemplate;
+    private SimpMessagingTemplate simpMessagingTemplate;
+
+    @Autowired
+    private JWTService jwtService;
+
+    @Autowired
+    private CardsUserDetailsService userDetailsService;
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry){
         registry.addEndpoint("/ws")
                 .setAllowedOriginPatterns("*")
-                .addInterceptors(new WebSocketUserIdentifier());
+                .addInterceptors(new JwtHandshakeInterceptor(jwtService, userDetailsService));
     }
 
     @Override
@@ -64,7 +73,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                     System.out.println("User '" + username + "' subscribed to: " + destination);
                 }
 
-                // TODO: Throw error if authenitcation went wrong instead of default user
+                // TODO: Is this necessary?
                 // Add the username to the message headers
                 Message newMessage = MessageBuilder.fromMessage(message)
                                         .setHeader("username", username)
