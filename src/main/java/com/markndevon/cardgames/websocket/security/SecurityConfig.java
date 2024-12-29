@@ -1,6 +1,7 @@
 package com.markndevon.cardgames.websocket.security;
 
 import com.markndevon.cardgames.service.authentication.CardsUserDetailsService;
+import com.markndevon.cardgames.websocket.security.filters.JwtFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,23 +17,28 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
     @Autowired
     private CardsUserDetailsService userDetailsService;
+
+    @Autowired
+    private JwtFilter jwtFilter;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults()) // Set up CORS TODO: Finish configuration, only one domain so shouldnt need to be wide open
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/login", "/register").permitAll() // Allow login endpoint
-                        .anyRequest().authenticated()              // Secure everything
+                        .requestMatchers("login", "register").permitAll() // Allow login endpoint
+                        .anyRequest().authenticated()            // Secure everything
                 ).httpBasic(Customizer.withDefaults())         // Basic Auth (JWT is recommended for production)
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
