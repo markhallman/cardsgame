@@ -1,11 +1,8 @@
 package com.markndevon.cardgames.websocket.config;
 
 import com.markndevon.cardgames.controller.HeartsController;
-import com.markndevon.cardgames.message.GameUpdateMessage;
-import com.markndevon.cardgames.model.gamestates.HeartsGameState;
 import com.markndevon.cardgames.service.authentication.CardsUserDetailsService;
 import com.markndevon.cardgames.service.authentication.JWTService;
-import com.markndevon.cardgames.websocket.WebSocketUserIdentifier;
 import com.markndevon.cardgames.websocket.security.JwtHandshakeInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -23,8 +20,6 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Configuration
 @EnableWebSocketMessageBroker
