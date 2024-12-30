@@ -24,7 +24,6 @@ public class UserController {
 
     @PostMapping("/login")
     public String login(@RequestBody CardGameUser user){
-        logger.log(user.toString());
         return userService.verify(user);
     }
 }
