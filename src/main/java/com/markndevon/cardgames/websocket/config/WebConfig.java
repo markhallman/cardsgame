@@ -1,4 +1,4 @@
-package com.markndevon.cardgames;
+package com.markndevon.cardgames.websocket.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
