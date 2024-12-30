@@ -2,10 +2,8 @@ package com.markndevon.cardgames.websocket.security;
 
 import com.markndevon.cardgames.service.authentication.CardsUserDetailsService;
 import com.markndevon.cardgames.service.authentication.JWTService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
