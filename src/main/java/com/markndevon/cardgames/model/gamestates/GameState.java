@@ -4,7 +4,6 @@ import com.markndevon.cardgames.logger.Logger;
 import com.markndevon.cardgames.model.Card;
 import com.markndevon.cardgames.model.config.RulesConfig;
 import com.markndevon.cardgames.model.player.Player;
-import com.markndevon.cardgames.model.scoreboard.ScoreBoard;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
@@ -16,8 +15,6 @@ public abstract class GameState {
     protected final RulesConfig rulesConfig;
     @Autowired
     protected final Logger logger;
-    protected final ScoreBoard scoreBoard;
-
     public GameState(final Player[] players, final RulesConfig rulesConfig, final int gameId, Logger logger) {
         this.players = players;
         this.playerDescriptors = Arrays.stream(players)
@@ -31,7 +28,6 @@ public abstract class GameState {
             throw new IllegalArgumentException("Can not create a game with less than 2 players or more than 52 players");
         }
 
-        scoreBoard = new ScoreBoard(this){};
     }
 
     /**

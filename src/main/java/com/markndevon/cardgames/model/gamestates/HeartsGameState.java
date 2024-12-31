@@ -36,6 +36,8 @@ public class HeartsGameState extends GameState {
     private boolean kittyWon = false;
     private final PassDeterminer passDeterminer;
 
+    private final HeartsScoreboard scoreBoard;
+
     @Autowired
     private final Logger logger;
 
@@ -44,6 +46,7 @@ public class HeartsGameState extends GameState {
         super(players, rulesConfig, gameId, logger);
         this.passDeterminer = new PassDeterminer(players.length, rulesConfig);
         this.logger = logger;
+        this.scoreBoard = new HeartsScoreboard(this);
     }
 
     public void start() {
@@ -332,10 +335,8 @@ public class HeartsGameState extends GameState {
         ((HeartsScoreboard)scoreBoard).updateScore(buildUpdateScoreMap()); // TODO: Not sure if continually casting is right here?
         scoreBoard.saveHandScore();
 
-        //TODO: Web socket communication
+        //TODO: Unnecessary?
         UpdateScoreBoardMessage finalHandScore = new UpdateScoreBoardMessage(scoreBoard.getScore());
-
-        //server.broadcastMessage(finalHandScore);
 
         logger.log("Score updated: " + scoreBoard.getScore());
         if(scoreBoard.getScore().values().stream().anyMatch(i -> i >= heartsRulesConfig.getPointsToLose())) {

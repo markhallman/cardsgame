@@ -99,6 +99,7 @@ public class HeartsService extends GameService {
      * Convenience method for playing CPU turns in the game
      *
      * // TODO: Some repeated code with the playCard method, should probably refactor
+     * // TODO: If the hand ends on a CPU Player, need to reset the trick
      */
     private void playCPUTurns(){
         // If the next player is a CPU, resolve their action as well
