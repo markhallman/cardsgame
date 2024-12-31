@@ -247,8 +247,7 @@ public class HeartsGameState extends GameState {
         if(Arrays.stream(players).allMatch(player -> player.getHand().isEmpty())) {
             logger.log("Hand finished, resolving.");
             updateScoreBoardAtHandEnd();
-
-            // TODO: Need to communicate back to client
+            reset();
         }
     }
 /*
@@ -319,7 +318,7 @@ public class HeartsGameState extends GameState {
         kittyWon = false;
         handCount++;
         dealNewHand();
-        passCountDown.set(players.length);
+        //passCountDown.set(players.length);
         logger.log("Hand reset, resolving.");
         //possiblyPassCards();
     }
