@@ -113,6 +113,7 @@ public class HeartsGameState extends GameState {
     private void dealNewHand() {
         final List<Card> extraCards = Util.dealCardsAndReturnExtra(players);
         kitty.addAll(extraCards);
+        determineStartingPlayer();
     }
 
     private void determineStartingPlayer() {

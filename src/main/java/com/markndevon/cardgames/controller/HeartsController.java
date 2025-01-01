@@ -93,7 +93,7 @@ public class HeartsController extends GameController {
      */
     //TODO: Does this need to be exposed? All joins should come through the GamesAPIController
     @Override
-    @MessageMapping("/hearts/game-room/{gameId}/joinGame")
+    @MessageMapping("/hearts/game-lobby/{gameId}/joinGame")
     public PlayerJoinedMessage joinGame(@DestinationVariable int gameId,
                                         @Payload Player.PlayerDescriptor playerJoined){
         Player playerToAdd = new HumanPlayer(playerJoined);
