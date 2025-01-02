@@ -71,7 +71,7 @@ public class WebSocketSubscriptionListener implements ApplicationListener<Sessio
         if(extractedGameRoomId > 0){
             assert destination != null;
 
-            logger.log("DETECTED CONNECTION TO GAMEROOM" + extractedLobbyId + ", BROADCASTING GAMES TATE");
+            logger.log("DETECTED CONNECTION TO GAME ROOM" + extractedLobbyId + ", BROADCASTING GAME STATE");
             HeartsGameState currGameState =
                     (HeartsGameState) heartsController.getGameService(extractedGameRoomId).getGameState();
             GameUpdateMessage currGameStateMessage = new GameUpdateMessage(currGameState);
