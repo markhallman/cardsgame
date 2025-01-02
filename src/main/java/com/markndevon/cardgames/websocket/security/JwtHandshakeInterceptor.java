@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
+import java.net.URI;
 import java.util.Map;
 
 public class JwtHandshakeInterceptor implements HandshakeInterceptor {
@@ -28,6 +29,8 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
             WebSocketHandler wsHandler,
             Map<String, Object> attributes) throws Exception {
 
+        URI uri = request.getURI();
+        System.out.println("URI: " + uri);
         String query = request.getURI().getQuery();
         System.out.println("Query: " + query);
         if (query != null && query.contains("token=")) {
@@ -42,7 +45,6 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
                 return jwtService.validateToken(token, userDetails);
             }
         }
-
 
         response.setStatusCode(HttpStatus.UNAUTHORIZED);
         return false;

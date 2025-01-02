@@ -1,8 +1,11 @@
 package com.markndevon.cardgames.websocket;
 
 import com.markndevon.cardgames.controller.HeartsController;
+import com.markndevon.cardgames.logger.Logger;
 import com.markndevon.cardgames.message.GameUpdateMessage;
+import com.markndevon.cardgames.message.LobbyUpdateMessage;
 import com.markndevon.cardgames.model.gamestates.HeartsGameState;
+import com.markndevon.cardgames.service.HeartsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Lazy;
@@ -25,7 +28,11 @@ public class WebSocketSubscriptionListener implements ApplicationListener<Sessio
     @Lazy
     private final HeartsController heartsController;
 
+    @Autowired
+    private Logger logger;
+
     private final static Pattern GAME_ROOM_PATTERN = Pattern.compile("/topic/hearts/game-room/([0-9]+)", Pattern.CASE_INSENSITIVE);
+    private final static Pattern LOBBY_PATTERN = Pattern.compile("/topic/hearts/game-lobby/([0-9]+)", Pattern.CASE_INSENSITIVE);
 
 
     public WebSocketSubscriptionListener(SimpMessagingTemplate messagingTemplate, HeartsController heartsController) {
@@ -33,9 +40,9 @@ public class WebSocketSubscriptionListener implements ApplicationListener<Sessio
         this.heartsController = heartsController;
     }
 
-    private static int matchesGameRoom(final String input) {
+    private static int matchesRoom(final String input, final Pattern pattern) {
         // Match regex against input
-        final Matcher matcher = GAME_ROOM_PATTERN.matcher(input);
+        final Matcher matcher = pattern.matcher(input);
         // Use results...
         int gameId = -1; // return -1 if expression does not match
 
@@ -46,19 +53,38 @@ public class WebSocketSubscriptionListener implements ApplicationListener<Sessio
         return gameId;
     }
 
+    private static int matchesGameRoom(final String input) {
+        return matchesRoom(input, GAME_ROOM_PATTERN);
+    }
+
+    private static int matchesLobby(final String input) {
+        return matchesRoom(input, LOBBY_PATTERN);
+    }
+
     @Override
     public void onApplicationEvent(SessionSubscribeEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         String destination = headerAccessor.getDestination();
-        int extractedGameId = matchesGameRoom(destination);
+        int extractedGameRoomId = matchesGameRoom(destination);
+        int extractedLobbyId = matchesLobby(destination);
 
-        System.out.println("Extracted gameID " + extractedGameId);
-        if(extractedGameId > 0){
-            System.out.println("DETECTED CONNECTION TO GAMEROOM, BROADCASTING GAMESTATE");
+        if(extractedGameRoomId > 0){
+            assert destination != null;
+
+            logger.log("DETECTED CONNECTION TO GAMEROOM" + extractedLobbyId + ", BROADCASTING GAMES TATE");
             HeartsGameState currGameState =
-                    (HeartsGameState) heartsController.getGameService(extractedGameId).getGameState();
+                    (HeartsGameState) heartsController.getGameService(extractedGameRoomId).getGameState();
             GameUpdateMessage currGameStateMessage = new GameUpdateMessage(currGameState);
             messagingTemplate.convertAndSend(destination, currGameStateMessage);
+        }
+
+        if(extractedLobbyId > 0){
+            assert destination != null;
+
+            logger.log("DETECTED CONNECTION TO LOBBY " + extractedLobbyId + ", BROADCASTING LOBBY STATE");
+            HeartsService heartsService = heartsController.getGameService(extractedLobbyId);
+            LobbyUpdateMessage currLobbyMessage = new LobbyUpdateMessage(heartsService.getPlayers(), heartsService.getRulesConfig());
+            messagingTemplate.convertAndSend(destination, currLobbyMessage);
         }
     }
 }
