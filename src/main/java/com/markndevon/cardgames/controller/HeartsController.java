@@ -88,7 +88,6 @@ public class HeartsController extends GameController {
      * @return PlayerJoinedMessage with the details of the joining player and the gameId of the game they have joined
      */
     @Override
-    @MessageMapping("/hearts/game-lobby/{gameId}")
     public LobbyUpdateMessage joinGame(@DestinationVariable int gameId,
                                         @Payload Player.PlayerDescriptor playerJoined) {
         Player playerToAdd = new HumanPlayer(playerJoined);
@@ -99,7 +98,11 @@ public class HeartsController extends GameController {
 
     @Override
     @MessageMapping("/hearts/game-lobby/{gameId}")
-    public LobbyUpdateMessage leaveGame(int gameId, Player.PlayerDescriptor player) {
+    public LobbyUpdateMessage leaveGame(@DestinationVariable int gameId,
+                                        @Payload Player.PlayerDescriptor playerLeave) {
+        Player playerToRmeove = new HumanPlayer(playerLeave);
+        HeartsService heartsService = getGameService(gameId);
+        heartsService.removePlayer(playerToRmeove);
         return null;
     }
 

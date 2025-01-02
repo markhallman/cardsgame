@@ -137,21 +137,4 @@ public class HeartsService extends GameService {
         clientMessenger.convertAndSend("/topic/hearts/game-room/" + gameId + "", currGameStateMessage);
     }
 
-    /**
-     * Utility method for filling out a gameState with CPU players
-     *
-     * @return player array updated with CPU players
-     */
-    private Player[] possiblyFillPlayers() {
-        int size = getPlayers().size();
-
-        for(int i = size; i < 4; i++) {
-            addPlayer(new RandomAIPlayer("AI" + i, i));
-        }
-
-        System.out.println("Filling up game: " + getPlayers());
-
-        return getPlayers().toArray(new Player[0]);
-    }
-
 }
