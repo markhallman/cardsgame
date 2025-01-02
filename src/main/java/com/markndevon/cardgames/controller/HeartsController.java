@@ -60,7 +60,6 @@ public class HeartsController extends GameController {
         HeartsService heartsService = (HeartsService) gameServiceFactory.createGameService(HEARTS, gameId, heartsRulesConfig);
         heartsService.addPlayer(new HumanPlayer(username, 0)); // Just assigning id 0 is okay here since its the first player
         gameRooms.put(gameId, heartsService);
-        //TODO: add the player who created the room
 
         return new StartGameRequest(heartsRulesConfig);
     }
@@ -101,8 +100,7 @@ public class HeartsController extends GameController {
         LobbyUpdateMessage playerAddedMessage =
                 new LobbyUpdateMessage(heartsService.getPlayers(), heartsService.getRulesConfig());
 
-        // TODO: Should we be sendin this from the API controller or here? Does it matter?
-        clientMessenger.convertAndSend("/topic/hearts/game-lobby/" + gameId, playerAddedMessage );
+        clientMessenger.convertAndSend("/topic/hearts/game-lobby/" + gameId, playerAddedMessage);
 
         return new LobbyUpdateMessage(heartsService.getPlayers(), heartsService.getRulesConfig());
     }
@@ -179,7 +177,7 @@ public class HeartsController extends GameController {
 
 
     /**
-     * Method called by the client when sending a chat message. Rebroadcast to all clients listeing on the channel
+     * Method called by the client when sending a chat message. Rebroadcast to all clients listening on the channel
      *
      * @param gameId game identification value
      * @param chatMessage message detailing the message contents and the message sender
