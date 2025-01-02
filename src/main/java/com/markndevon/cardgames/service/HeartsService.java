@@ -19,12 +19,9 @@ public class HeartsService extends GameService {
     private SimpMessagingTemplate clientMessenger;
     @JsonIgnore
     private Logger logger;
-
     @JsonIgnore
     private static long CPU_TURN_SLEEP_TIME = 1000L;
 
-
-    // TODO: Need to take in an initial playerID? Or just initialize a null list of players? GameState should probably track that
     public HeartsService(int gameId, HeartsRulesConfig rulesConfig, SimpMessagingTemplate clientMessenger, Logger logger){
         super(gameId, rulesConfig);
         this.clientMessenger = clientMessenger;
@@ -79,9 +76,7 @@ public class HeartsService extends GameService {
      * Service method for actually starting the game of hearts. Fills in any unoccupied spots in the game with
      * Computer players, triggers teh start method of the GameState, and communicates initial game state to all
      * the clients
-     *
-     * TODO: Should probably communicate FULL game state instead of having a deal message/legal plays message
-     */
+     **/
     @Override
     public void startGame(){
         gameState = new HeartsGameState(possiblyFillPlayers(), (HeartsRulesConfig) rulesConfig, gameId, logger);
