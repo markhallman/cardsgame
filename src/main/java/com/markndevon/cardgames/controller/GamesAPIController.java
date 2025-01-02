@@ -78,6 +78,7 @@ public class GamesAPIController {
 
         //TODO: If the user is already in the game, we should probably reject it
         //HEARTS_CONTROLLER.getGameService(gameId).getPlayers()
+        // TODO: Should support other games here
 
         int playerId = HEARTS_CONTROLLER.getCurrentPlayerIdForGame(gameId);
         return HEARTS_CONTROLLER.joinGame(gameId, new Player.PlayerDescriptor(username, playerId, true));

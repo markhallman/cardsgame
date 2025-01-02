@@ -11,6 +11,7 @@ import com.markndevon.cardgames.service.GameServiceFactory;
 import com.markndevon.cardgames.service.HeartsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.*;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 import java.util.ArrayList;
@@ -32,6 +33,9 @@ public class HeartsController extends GameController {
     private Logger logger;
 
     private final GameServiceFactory gameServiceFactory;
+
+    @Autowired
+    private SimpMessagingTemplate clientMessenger;
 
     public HeartsController(GameServiceFactory gameServiceFactory) {
         this.gameServiceFactory = gameServiceFactory;
@@ -93,6 +97,13 @@ public class HeartsController extends GameController {
         Player playerToAdd = new HumanPlayer(playerJoined);
         HeartsService heartsService = getGameService(gameId);
         heartsService.addPlayer(playerToAdd);
+
+        LobbyUpdateMessage playerAddedMessage =
+                new LobbyUpdateMessage(heartsService.getPlayers(), heartsService.getRulesConfig());
+
+        // TODO: Should we be sendin this from the API controller or here? Does it matter?
+        clientMessenger.convertAndSend("/topic/hearts/game-lobby/" + gameId, playerAddedMessage );
+
         return new LobbyUpdateMessage(heartsService.getPlayers(), heartsService.getRulesConfig());
     }
 
@@ -100,15 +111,19 @@ public class HeartsController extends GameController {
     @MessageMapping("/hearts/game-lobby/{gameId}")
     public LobbyUpdateMessage leaveGame(@DestinationVariable int gameId,
                                         @Payload Player.PlayerDescriptor playerLeave) {
-        Player playerToRmeove = new HumanPlayer(playerLeave);
+        Player playerToRemove = new HumanPlayer(playerLeave);
         HeartsService heartsService = getGameService(gameId);
-        heartsService.removePlayer(playerToRmeove);
-        return null;
+        heartsService.removePlayer(playerToRemove);
+        return new LobbyUpdateMessage(heartsService.getPlayers(), heartsService.getRulesConfig());
     }
 
     @Override
+    @MessageMapping("/hearts/game-room/{gameId}/updateRules")
     public LobbyUpdateMessage updateRules(int gameId, RulesConfig rulesConfig) {
-        return null;
+        HeartsService heartsService = getGameService(gameId);
+        heartsService.setRulesConfig(rulesConfig);
+
+        return new LobbyUpdateMessage(heartsService.getPlayers(), heartsService.getRulesConfig());
     }
 
     /**

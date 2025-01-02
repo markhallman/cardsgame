@@ -35,6 +35,9 @@ public abstract class GameService {
     public RulesConfig getRulesConfig() {
         return rulesConfig;
     }
+    public void setRulesConfig(RulesConfig rulesConfig) {
+        this.rulesConfig = rulesConfig;
+    }
 
     public List<Player> getPlayers(){
         return players;
