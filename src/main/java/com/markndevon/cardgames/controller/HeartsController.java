@@ -2,9 +2,7 @@ package com.markndevon.cardgames.controller;
 
 import com.markndevon.cardgames.logger.Logger;
 import com.markndevon.cardgames.message.*;
-import com.markndevon.cardgames.model.config.HeartsRulesConfig;
 import com.markndevon.cardgames.model.config.RulesConfig;
-import com.markndevon.cardgames.model.gamestates.GameState;
 import com.markndevon.cardgames.model.gamestates.HeartsGameState;
 import com.markndevon.cardgames.model.player.HumanPlayer;
 import com.markndevon.cardgames.model.player.Player;
@@ -17,8 +15,6 @@ import org.springframework.stereotype.Controller;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static com.markndevon.cardgames.model.gamestates.GameType.HEARTS;
@@ -91,14 +87,25 @@ public class HeartsController extends GameController {
      * @param playerJoined player descriptor of the joining player, to be added to the game state
      * @return PlayerJoinedMessage with the details of the joining player and the gameId of the game they have joined
      */
-    //TODO: Does this need to be exposed? All joins should come through the GamesAPIController
     @Override
-    @MessageMapping("/hearts/game-lobby/{gameId}/joinGame")
-    public PlayerJoinedMessage joinGame(@DestinationVariable int gameId,
-                                        @Payload Player.PlayerDescriptor playerJoined){
+    @MessageMapping("/hearts/game-lobby/{gameId}")
+    public LobbyUpdateMessage joinGame(@DestinationVariable int gameId,
+                                        @Payload Player.PlayerDescriptor playerJoined) {
         Player playerToAdd = new HumanPlayer(playerJoined);
-        getGameService(gameId).addPlayer(playerToAdd);
-        return new PlayerJoinedMessage(playerToAdd, gameId);
+        HeartsService heartsService = getGameService(gameId);
+        heartsService.addPlayer(playerToAdd);
+        return new LobbyUpdateMessage(heartsService.getPlayers(), heartsService.getRulesConfig());
+    }
+
+    @Override
+    @MessageMapping("/hearts/game-lobby/{gameId}")
+    public LobbyUpdateMessage leaveGame(int gameId, Player.PlayerDescriptor player) {
+        return null;
+    }
+
+    @Override
+    public LobbyUpdateMessage updateRules(int gameId, RulesConfig rulesConfig) {
+        return null;
     }
 
     /**

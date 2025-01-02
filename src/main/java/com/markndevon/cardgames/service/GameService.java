@@ -14,7 +14,6 @@ public abstract class GameService {
     protected final List<Player> players = new ArrayList<>();
 
     protected boolean gameIsStarted = false;
-
     @JsonIgnore
     GameState gameState;
 
@@ -40,9 +39,22 @@ public abstract class GameService {
         return players;
     }
 
+    public boolean getGameIsStarted(){return gameIsStarted; }
+
+    public boolean gameIsFull() {
+        // This will be true if there are more than the max number of players,
+        // but it's not this classes job to manage that
+        return players.size() == rulesConfig.getNumPlayers();
+    }
+
     public void addPlayer(Player player){
+        if(gameIsFull()){
+            throw new IllegalArgumentException("Game is full, can't add more players");
+        }
         players.add(player);
     }
+
+
 
     public abstract void startGame();
     public abstract void updateClients();

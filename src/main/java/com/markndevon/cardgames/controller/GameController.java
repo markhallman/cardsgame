@@ -19,7 +19,10 @@ public abstract class GameController {
     protected final Map<Integer, GameService> gameRooms = new ConcurrentHashMap<>();
 
     public abstract StartGameRequest createGame(int gameId, RulesConfig rulesConfig, String username);
-    public abstract PlayerJoinedMessage joinGame(int gameId, Player.PlayerDescriptor player);
+    public abstract LobbyUpdateMessage joinGame(int gameId, Player.PlayerDescriptor player);
+    public abstract LobbyUpdateMessage leaveGame(int gameId, Player.PlayerDescriptor player);
+    public abstract LobbyUpdateMessage updateRules(int gameId, RulesConfig rulesConfig);
+    public abstract GameStartMessage startGame(int gameId);
     public abstract GameUpdateMessage playCard(int gameId, PlayCardMessage cardMessage, String username) throws IllegalAccessException;
     public abstract List<GameService> getActiveGames();
 

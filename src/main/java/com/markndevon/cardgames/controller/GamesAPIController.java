@@ -1,9 +1,6 @@
 package com.markndevon.cardgames.controller;
 
-import com.markndevon.cardgames.message.ActiveGamesMessage;
-import com.markndevon.cardgames.message.CreateGameMessage;
-import com.markndevon.cardgames.message.GameStartMessage;
-import com.markndevon.cardgames.message.PlayerJoinedMessage;
+import com.markndevon.cardgames.message.*;
 import com.markndevon.cardgames.model.config.HeartsRulesConfig;
 import com.markndevon.cardgames.model.config.RulesConfig;
 import com.markndevon.cardgames.model.player.Player;
@@ -75,7 +72,7 @@ public class GamesAPIController {
      * @return PlayerJoinedMessage with the descriptor of the player joining and the game identification value
      */
     @PostMapping("/games/joingame/{gameId}")
-    public PlayerJoinedMessage joinGame(@PathVariable int gameId) {
+    public LobbyUpdateMessage joinGame(@PathVariable int gameId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication != null ? authentication.getName() : "anonymousUser";
 

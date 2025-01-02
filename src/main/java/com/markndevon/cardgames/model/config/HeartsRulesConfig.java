@@ -1,6 +1,6 @@
 package com.markndevon.cardgames.model.config;
 
-public class HeartsRulesConfig implements RulesConfig {
+public class HeartsRulesConfig extends RulesConfig {
 
     // two of clubs leads
     public static final int START_CARD_RULES_2_CLUBS = 0;
@@ -20,6 +20,7 @@ public class HeartsRulesConfig implements RulesConfig {
     private static final boolean NO_TRICKS_MINUS_5_DEFAULT = false;
     private static final int POINTS_TO_LOSE_DEFAULT = 100;
     private static final int FIRST_CARD_RULE_DEFAULT = START_CARD_RULES_2_CLUBS;
+    private static final int DEFAULT_NUM_PLAYERS = 4;
 
     //endregion
 
@@ -50,7 +51,9 @@ public class HeartsRulesConfig implements RulesConfig {
 
     public enum IntegerRules {
         POINTS_TO_LOSE("Game ends when the first player reaches this many points", POINTS_TO_LOSE_DEFAULT),
-        FIRST_TRICK("What is allowed to be lead on the first trick?", FIRST_CARD_RULE_DEFAULT);
+        FIRST_TRICK("What is allowed to be lead on the first trick?", FIRST_CARD_RULE_DEFAULT),
+
+        NUM_PLAYERS("Number of players", DEFAULT_NUM_PLAYERS);
 
         private final String description;
         private final int defaultValue;
@@ -100,10 +103,14 @@ public class HeartsRulesConfig implements RulesConfig {
 
     private final boolean kittyWonFirstTrick;
 
+    private final int numPlayers;
+
     //endregion
 
     private HeartsRulesConfig(final int startCardRules, final boolean pointsAllowedFirstTrick, final boolean heartsMustBeBroken, final boolean jackMinus10,
-                        final boolean noTricksMinus5, final boolean shootTheSun, final int pointsToLose, final boolean jackRequired, final boolean kittyWonFirstTrick) {
+                        final boolean noTricksMinus5, final boolean shootTheSun, final int pointsToLose, final boolean jackRequired, final boolean kittyWonFirstTrick,
+                              final int numPlayers) {
+        super(DEFAULT_NUM_PLAYERS);
         this.startCardRules = startCardRules;
         this.pointsAllowedFirstTrick = pointsAllowedFirstTrick;
         this.heartsMustBeBroken = heartsMustBeBroken;
@@ -113,6 +120,7 @@ public class HeartsRulesConfig implements RulesConfig {
         this.pointsToLose = pointsToLose;
         this.jackRequired = jackRequired;
         this.kittyWonFirstTrick = kittyWonFirstTrick;
+        this.numPlayers = numPlayers;
 
         if(startCardRules != START_CARD_RULES_2_CLUBS && startCardRules != START_CARD_RULES_NO_POINTS
                 && startCardRules != START_CARD_RULES_ANARCHY) {
@@ -123,6 +131,10 @@ public class HeartsRulesConfig implements RulesConfig {
         }
         if(startCardRules == START_CARD_RULES_ANARCHY && pointsAllowedFirstTrick) {
             throw new IllegalArgumentException("Anarchy start rules can not be enabled if no points are allowed on the first trick");
+        }
+
+        if(numPlayers < 3 || numPlayers > 7){
+            throw new IllegalArgumentException("Number of players must be between 3 and 7");
         }
     }
 
@@ -162,6 +174,8 @@ public class HeartsRulesConfig implements RulesConfig {
         return kittyWonFirstTrick;
     }
 
+    public int getNumPlayers() { return numPlayers; }
+
     public boolean getRule(final BooleanRule booleanRule) {
         switch (booleanRule) {
             case KITTY_WON_FIRST_TRICK -> { return isKittyWonFirstTrick(); }
@@ -178,6 +192,7 @@ public class HeartsRulesConfig implements RulesConfig {
         switch (integerRules) {
             case POINTS_TO_LOSE -> { return getPointsToLose(); }
             case FIRST_TRICK -> { return getStartCardRules(); }
+            case NUM_PLAYERS -> { return getNumPlayers(); }
             default -> throw new IllegalStateException();
         }
     }
@@ -195,6 +210,8 @@ public class HeartsRulesConfig implements RulesConfig {
         private int pointsToLose = POINTS_TO_LOSE_DEFAULT;
         private boolean jackRequired = JACK_REQUIRED_DEFAULT;
         private boolean kittyWonFirstTrick = KITTY_WON_FIRST_TRICK_DEFAULT;
+
+        private int numPlayers = DEFAULT_NUM_PLAYERS;
 
         public HeartsBuilder() {}
 
@@ -237,6 +254,11 @@ public class HeartsRulesConfig implements RulesConfig {
             return this;
         }
 
+        public HeartsBuilder setNumPlayers(final int numPlayers) {
+            this.numPlayers = numPlayers;
+            return this;
+        }
+
         public void setKittyWonFirstTrick(boolean kittyWonFirstTrick) {
             this.kittyWonFirstTrick = kittyWonFirstTrick;
         }
@@ -255,11 +277,12 @@ public class HeartsRulesConfig implements RulesConfig {
             switch (integerRules) {
                 case POINTS_TO_LOSE -> setPointsToLose(value);
                 case FIRST_TRICK -> setStartCardRules(value);
+                case NUM_PLAYERS -> setNumPlayers(value);
             }
         }
         public HeartsRulesConfig build() {
             return new HeartsRulesConfig(startCardRules, pointsFirstTrick, heartsMustBeBroken,
-                    jackMinus10, noTricksMinus5, shootTheSun, pointsToLose, jackRequired, kittyWonFirstTrick);
+                    jackMinus10, noTricksMinus5, shootTheSun, pointsToLose, jackRequired, kittyWonFirstTrick, numPlayers);
         }
     }
 

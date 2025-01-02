@@ -20,6 +20,8 @@ public enum MessageType {
     UpdateLegalPlaysMessage,
     PassCardsMessage,
     ShowPassCardsDialogMessage,
+
+    LobbyUpdateMessage,
     GameDoneMessage, HandResolvedMessage;
 
     @Override
