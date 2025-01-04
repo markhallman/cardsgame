@@ -51,7 +51,7 @@ public abstract class GameService {
         return players.size() == rulesConfig.getNumPlayers();
     }
 
-    public void addPlayer(Player player) {
+    public synchronized void addPlayer(Player player) {
         if(gameIsStarted){
             throw new IllegalArgumentException("Game has already started, can't add more players");
         }
@@ -62,7 +62,7 @@ public abstract class GameService {
         players.add(player);
     }
 
-    public void removePlayer(Player player) {
+    public synchronized void removePlayer(Player player) {
         players.remove(player);
 
         if(gameIsStarted){

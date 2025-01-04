@@ -112,6 +112,9 @@ public class HeartsController extends GameController {
         Player playerToRemove = new HumanPlayer(playerLeave);
         HeartsService heartsService = getGameService(gameId);
         heartsService.removePlayer(playerToRemove);
+        if(heartsService.getPlayers().isEmpty()){
+            gameRooms.remove(heartsService);
+        }
         return new LobbyUpdateMessage(heartsService.getPlayers(), heartsService.getRulesConfig());
     }
 
