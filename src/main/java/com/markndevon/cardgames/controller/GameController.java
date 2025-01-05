@@ -9,6 +9,7 @@ import com.markndevon.cardgames.service.HeartsService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /*
@@ -56,5 +57,16 @@ public abstract class GameController {
 
     public void kickUser(String username) {
         System.out.println("Im kicking a user from the game!!!");
+
+        // TODO: Worst possible way to check this, but wont matter unless we have more than like 10000 games going on
+        //      Should probably hash the gameService by username or something
+        for (GameService gameRoom : gameRooms.values()){
+            Optional<Player> maybePlayer = gameRoom.getPlayers().stream().filter(player -> player.getName().equals(username)).findFirst();
+            if(maybePlayer.isPresent()){
+                Player playerToKick = maybePlayer.get();
+                gameRoom.removePlayer(playerToKick);
+            }
+        }
+
     }
 }
