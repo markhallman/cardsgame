@@ -14,8 +14,8 @@ import java.util.Map;
 
 public class JwtHandshakeInterceptor implements HandshakeInterceptor {
 
-    private JWTService jwtService;
-    private CardsUserDetailsService userDetailsService;
+    private final JWTService jwtService;
+    private final CardsUserDetailsService userDetailsService;
 
     public JwtHandshakeInterceptor(JWTService jwtService, CardsUserDetailsService userDetailsService) {
         this.jwtService = jwtService;
@@ -29,15 +29,10 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
             WebSocketHandler wsHandler,
             Map<String, Object> attributes) throws Exception {
 
-        URI uri = request.getURI();
-        System.out.println("URI: " + uri);
         String query = request.getURI().getQuery();
-        System.out.println("Query: " + query);
         if (query != null && query.contains("token=")) {
             String token = query.split("token=")[1];
             String username = jwtService.extractUsername(token);
-
-            System.out.println("Token: " + token + " Username: " + username);
 
             if (username != null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);

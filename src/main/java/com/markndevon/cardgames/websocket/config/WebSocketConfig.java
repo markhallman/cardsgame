@@ -19,7 +19,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
+import java.security.Principal;
 import java.util.Objects;
 
 @Configuration
@@ -52,31 +54,5 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.setApplicationDestinationPrefixes("/app");
         registry.enableSimpleBroker("/topic", "/queue");
         registry.setUserDestinationPrefix("/user"); // Configure user-specific messaging
-    }
-
-    @Override
-    public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(new ChannelInterceptor() {
-            @Override
-            public Message<?> preSend(Message<?> message, MessageChannel channel) {
-                var authentication = SecurityContextHolder.getContext().getAuthentication();
-                // TODO: RIGHT NOW NO USERNAME IN HEADER SO THIS IS USELESS
-                String username = (authentication != null) ? authentication.getName() : "anonymousUser";
-
-                // Check if the message is a SUBSCRIBE frame
-                if (Objects.requireNonNull(message.getHeaders().get("simpMessageType")).toString().equals("SUBSCRIBE")) {
-                    String destination = (String) message.getHeaders().get("simpDestination");
-                    System.out.println("User '" + username + "' subscribed to: " + destination);
-                }
-
-                // TODO: Is this necessary?
-                // Add the username to the message headers
-                Message newMessage = MessageBuilder.fromMessage(message)
-                                        .setHeader("username", username)
-                                        .build();
-
-                return newMessage;
-            }
-        });
     }
 }
