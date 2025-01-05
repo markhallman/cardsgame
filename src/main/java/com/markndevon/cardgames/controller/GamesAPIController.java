@@ -4,7 +4,12 @@ import com.markndevon.cardgames.message.*;
 import com.markndevon.cardgames.model.config.HeartsRulesConfig;
 import com.markndevon.cardgames.model.config.RulesConfig;
 import com.markndevon.cardgames.model.player.Player;
+import com.markndevon.cardgames.service.GameService;
+import com.markndevon.cardgames.service.HeartsService;
+import com.markndevon.cardgames.service.authentication.JWTService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +27,11 @@ public class GamesAPIController {
 
     @Autowired
     private HeartsController HEARTS_CONTROLLER;
-    // TODO: initial value should be grabbed from database
+
+    @Autowired
+    private JWTService jwtService;
+
+    // TODO: initial value should be grabbed from database (we need to add game state persistence to DB)
     // TODO: active games details should be stored in a database so we can retrieve them even if service crashes
     private static final AtomicInteger GAME_ID_CREATOR = new AtomicInteger(1000);
 
@@ -98,5 +107,18 @@ public class GamesAPIController {
                 .stream()
                 .flatMap(controller -> controller.getActiveGames().stream())
                 .collect(Collectors.toList()));
+    }
+
+    @GetMapping("/games/authenticated/{gameId}")
+    public ResponseEntity<Boolean> userIsGameMember(@PathVariable int gameId,
+                                                @RequestHeader("Authorization") String authHeader){
+        String token = authHeader.replace("Bearer ", "");
+        String username = jwtService.extractUsername(token);
+        GameService heartsService = HEARTS_CONTROLLER.getGameService(gameId);
+
+        boolean isAuthorized =
+                heartsService.getPlayers().stream().map(Player::getName).toList().contains(username);
+
+        return ResponseEntity.ok(isAuthorized);
     }
 }
