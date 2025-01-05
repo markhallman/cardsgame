@@ -89,4 +89,20 @@ public abstract class GameService {
 
     public abstract void startGame();
     public abstract void updateClients();
+
+    @Override
+    public boolean equals(Object obj){
+        if(obj == null){
+            return false;
+        }
+
+        if (obj.getClass() != this.getClass()) {
+            return false;
+        }
+
+        GameService service = (GameService) obj;
+
+        // The game ID should be assigned uniquely to the service, so this should be a marker of identity
+        return this.getGameId() == ((GameService) obj).getGameId();
+    }
 }

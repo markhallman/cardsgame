@@ -78,8 +78,15 @@ public class WebSocketSubscriptionListener {
         int extractedGameRoomId = matchesGameRoom(destination);
         int extractedLobbyId = matchesLobby(destination);
 
+        StompHeaderAccessor messageAccessor = StompHeaderAccessor.wrap(event.getMessage());
+        Map<String, Object> sessionAttributes = messageAccessor.getSessionAttributes();
+        assert sessionAttributes != null : "SESSION ATTRIBUTES NOT POPULATED";
+        String username = (String) sessionAttributes.get("username");
+        assert username != null : "USERNAME NOT SPECIFIED IN SESSION ATTRIBUTES";
+
         if(extractedGameRoomId > 0){
             assert destination != null;
+            webSocketHandler.cancelRemoval(username);
 
             logger.log("DETECTED CONNECTION TO GAME ROOM" + extractedLobbyId + ", BROADCASTING GAME STATE");
             HeartsGameState currGameState =
@@ -91,6 +98,7 @@ public class WebSocketSubscriptionListener {
 
         if(extractedLobbyId > 0){
             assert destination != null;
+            webSocketHandler.cancelRemoval(username);
 
             logger.log("DETECTED CONNECTION TO LOBBY " + extractedLobbyId + ", BROADCASTING LOBBY STATE");
             HeartsService heartsService = (HeartsService) heartsController.getGameService(extractedLobbyId);

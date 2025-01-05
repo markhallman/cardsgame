@@ -25,7 +25,6 @@ public class HeartsService extends GameService {
         super(gameId, rulesConfig);
         this.clientMessenger = clientMessenger;
         this.logger = logger;
-
     }
 
     /**
