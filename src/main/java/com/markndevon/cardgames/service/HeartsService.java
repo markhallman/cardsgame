@@ -2,13 +2,12 @@ package com.markndevon.cardgames.service;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.markndevon.cardgames.logger.Logger;
-import com.markndevon.cardgames.message.*;
-import com.markndevon.cardgames.model.Card;
+import com.markndevon.cardgames.message.GameUpdateMessage;
+import com.markndevon.cardgames.message.PlayCardMessage;
 import com.markndevon.cardgames.model.config.HeartsRulesConfig;
 import com.markndevon.cardgames.model.gamestates.HeartsGameState;
 import com.markndevon.cardgames.model.player.HumanPlayer;
 import com.markndevon.cardgames.model.player.Player;
-import com.markndevon.cardgames.model.player.RandomAIPlayer;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 /**

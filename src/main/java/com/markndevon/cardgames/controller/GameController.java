@@ -2,11 +2,8 @@ package com.markndevon.cardgames.controller;
 
 import com.markndevon.cardgames.message.*;
 import com.markndevon.cardgames.model.config.RulesConfig;
-import com.markndevon.cardgames.model.gamestates.GameState;
 import com.markndevon.cardgames.model.player.Player;
 import com.markndevon.cardgames.service.GameService;
-import com.markndevon.cardgames.service.HeartsService;
-import org.springframework.stereotype.Controller;
 
 import java.util.List;
 import java.util.Map;

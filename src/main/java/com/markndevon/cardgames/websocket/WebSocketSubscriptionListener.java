@@ -7,18 +7,20 @@ import com.markndevon.cardgames.message.LobbyUpdateMessage;
 import com.markndevon.cardgames.model.gamestates.HeartsGameState;
 import com.markndevon.cardgames.service.HeartsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
+import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Component
-public class WebSocketSubscriptionListener implements ApplicationListener<SessionSubscribeEvent> {
+public class WebSocketSubscriptionListener {
 
     @Autowired
     @Lazy
@@ -61,8 +63,8 @@ public class WebSocketSubscriptionListener implements ApplicationListener<Sessio
         return matchesRoom(input, LOBBY_PATTERN);
     }
 
-    @Override
-    public void onApplicationEvent(SessionSubscribeEvent event) {
+    @EventListener
+    public void handleWebSocketSubscription(SessionSubscribeEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         String destination = headerAccessor.getDestination();
         int extractedGameRoomId = matchesGameRoom(destination);
@@ -75,6 +77,7 @@ public class WebSocketSubscriptionListener implements ApplicationListener<Sessio
             HeartsGameState currGameState =
                     (HeartsGameState) heartsController.getGameService(extractedGameRoomId).getGameState();
             GameUpdateMessage currGameStateMessage = new GameUpdateMessage(currGameState);
+            // TODO: Maybe only send to connecting user so we're not spamming everyone
             messagingTemplate.convertAndSend(destination, currGameStateMessage);
         }
 
@@ -86,5 +89,16 @@ public class WebSocketSubscriptionListener implements ApplicationListener<Sessio
             LobbyUpdateMessage currLobbyMessage = new LobbyUpdateMessage(heartsService.getPlayers(), heartsService.getRulesConfig());
             messagingTemplate.convertAndSend(destination, currLobbyMessage);
         }
+    }
+
+    @EventListener
+    public void handleWebSocketUnsubscribe(SessionUnsubscribeEvent event){
+        logger.log("WEBSOCKET UNSUBSCRIBE DETECTED");
+    }
+
+    @EventListener
+    public void handleWebSocketDisconnect(SessionDisconnectEvent event){
+        logger.log("WEBSOCKET DISCONNECT DETECTED");
+        logger.log("DISCONNECT WAS FROM USER " + event.getMessage());
     }
 }
