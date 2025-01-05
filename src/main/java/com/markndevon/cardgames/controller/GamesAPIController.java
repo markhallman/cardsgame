@@ -121,4 +121,12 @@ public class GamesAPIController {
 
         return ResponseEntity.ok(isAuthorized);
     }
+
+    @GetMapping("/games/isStarted/{gameId}")
+    public ResponseEntity<Boolean> gameIsStarted(@PathVariable int gameId){
+
+        boolean gameIsStarted = HEARTS_CONTROLLER.getGameService(gameId).getGameIsStarted();
+        System.out.println("Game Is Started for game Id " + gameId + " " + gameIsStarted);
+        return ResponseEntity.ok(gameIsStarted);
+    }
 }
