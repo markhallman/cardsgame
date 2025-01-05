@@ -81,16 +81,23 @@ public class GamesAPIController {
      * @return PlayerJoinedMessage with the descriptor of the player joining and the game identification value
      */
     @PostMapping("/games/joingame/{gameId}")
-    public LobbyUpdateMessage joinGame(@PathVariable int gameId) {
+    public ResponseEntity<LobbyUpdateMessage> joinGame(@PathVariable int gameId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication != null ? authentication.getName() : "anonymousUser";
 
-        //TODO: If the user is already in the game, we should probably reject it
-        //HEARTS_CONTROLLER.getGameService(gameId).getPlayers()
+        boolean gameHasPlayer = HEARTS_CONTROLLER.getGameService(gameId).getPlayers().stream().map(Player::getName).toList().contains(username);
+
+        if(gameHasPlayer){
+            GameService service = HEARTS_CONTROLLER.getGameService(gameId);
+            LobbyUpdateMessage returnMessage =
+                    new LobbyUpdateMessage(service.getPlayers(), service.getRulesConfig());
+
+            return ResponseEntity.status(403).body(returnMessage);
+        }
         // TODO: Should support other games here
 
         int playerId = HEARTS_CONTROLLER.getCurrentPlayerIdForGame(gameId);
-        return HEARTS_CONTROLLER.joinGame(gameId, new Player.PlayerDescriptor(username, playerId, true));
+        return ResponseEntity.ok(HEARTS_CONTROLLER.joinGame(gameId, new Player.PlayerDescriptor(username, playerId, true)));
     }
 
     /**
