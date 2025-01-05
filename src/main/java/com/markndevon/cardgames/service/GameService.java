@@ -39,7 +39,7 @@ public abstract class GameService {
         this.rulesConfig = rulesConfig;
     }
 
-    public List<Player> getPlayers(){
+    public synchronized List<Player> getPlayers(){
         return players;
     }
 
