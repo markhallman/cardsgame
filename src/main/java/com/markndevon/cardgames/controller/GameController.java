@@ -55,18 +55,27 @@ public abstract class GameController {
         return gameRooms.get(gameId).getPlayers().size();
     }
 
+
+    /**
+     * Kick a user from any games they are currently participating in
+     *
+     * TODO: Probably also need to signal the client
+     *  so that they can be navigated away from the page (if they are still on it)
+     *
+     * @param username name of the user to kick
+     */
     public void kickUser(String username) {
         System.out.println("Im kicking a user from the game!!!");
 
-        // TODO: Worst possible way to check this, but wont matter unless we have more than like 10000 games going on
-        //      Should probably hash the gameService by username or something
+        // TODO: Worst possible way to check this, but wont matter unless we have more a ton of games going on
+        //      which seems unlikely.
+        //      Should probably hash the gameService by username or something for quick access
         for (GameService gameRoom : gameRooms.values()){
             Optional<Player> maybePlayer = gameRoom.getPlayers().stream().filter(player -> player.getName().equals(username)).findFirst();
             if(maybePlayer.isPresent()){
                 Player playerToKick = maybePlayer.get();
-                gameRoom.removePlayer(playerToKick);
+                leaveGame(gameRoom.getGameId(), playerToKick.getPlayerDescriptor());
             }
         }
-
     }
 }
