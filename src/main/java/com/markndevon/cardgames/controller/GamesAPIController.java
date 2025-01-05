@@ -81,9 +81,9 @@ public class GamesAPIController {
      * @return PlayerJoinedMessage with the descriptor of the player joining and the game identification value
      */
     @PostMapping("/games/joingame/{gameId}")
-    public ResponseEntity<LobbyUpdateMessage> joinGame(@PathVariable int gameId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication != null ? authentication.getName() : "anonymousUser";
+    public ResponseEntity<LobbyUpdateMessage> joinGame(@PathVariable int gameId, @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        String username = jwtService.extractUsername(token);
 
         boolean gameHasPlayer = HEARTS_CONTROLLER.getGameService(gameId).getPlayers().stream().map(Player::getName).toList().contains(username);
 
@@ -94,7 +94,7 @@ public class GamesAPIController {
 
             return ResponseEntity.status(403).body(returnMessage);
         }
-        // TODO: Should support other games here
+        // TODO: Should support other games here, not access HEARTS_CONTROLLER directly
 
         int playerId = HEARTS_CONTROLLER.getCurrentPlayerIdForGame(gameId);
         return ResponseEntity.ok(HEARTS_CONTROLLER.joinGame(gameId, new Player.PlayerDescriptor(username, playerId, true)));
