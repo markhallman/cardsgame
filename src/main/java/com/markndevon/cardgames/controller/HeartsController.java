@@ -74,7 +74,7 @@ public class HeartsController extends GameController {
     @MessageMapping("/hearts/game-room/{gameId}/startGame")
     public GameStartMessage startGame(@DestinationVariable int gameId) {
         logger.log("Starting game with ID " + gameId);
-        HeartsService heartsService = getGameService(gameId);
+        HeartsService heartsService = (HeartsService) getGameService(gameId);
         heartsService.startGame();
         return new GameStartMessage(heartsService.getRulesConfig(),
                 heartsService.getPlayers().stream().map(Player::getPlayerDescriptor).toList().toArray(new Player.PlayerDescriptor[0]));
@@ -94,7 +94,7 @@ public class HeartsController extends GameController {
     public LobbyUpdateMessage joinGame(@DestinationVariable int gameId,
                                         @Payload Player.PlayerDescriptor playerJoined) {
         Player playerToAdd = new HumanPlayer(playerJoined);
-        HeartsService heartsService = getGameService(gameId);
+        HeartsService heartsService = (HeartsService) getGameService(gameId);
         heartsService.addPlayer(playerToAdd);
 
         LobbyUpdateMessage playerAddedMessage =
@@ -110,7 +110,7 @@ public class HeartsController extends GameController {
     public LobbyUpdateMessage leaveGame(@DestinationVariable int gameId,
                                         @Payload Player.PlayerDescriptor playerLeave) {
         Player playerToRemove = new HumanPlayer(playerLeave);
-        HeartsService heartsService = getGameService(gameId);
+        HeartsService heartsService = (HeartsService) getGameService(gameId);
         heartsService.removePlayer(playerToRemove);
         if(heartsService.getPlayers().isEmpty()){
             gameRooms.remove(heartsService);
@@ -121,7 +121,7 @@ public class HeartsController extends GameController {
     @Override
     @MessageMapping("/hearts/game-room/{gameId}/updateRules")
     public LobbyUpdateMessage updateRules(int gameId, RulesConfig rulesConfig) {
-        HeartsService heartsService = getGameService(gameId);
+        HeartsService heartsService = (HeartsService) getGameService(gameId);
         heartsService.setRulesConfig(rulesConfig);
 
         return new LobbyUpdateMessage(heartsService.getPlayers(), heartsService.getRulesConfig());
@@ -144,7 +144,7 @@ public class HeartsController extends GameController {
         logger.log("PlayCard message received for game " + gameId + " from player " + username + " with card " + cardMessage.getCard());
         logger.log("PlayCard other stuff " + cardMessage.getPlayerName() + " " + cardMessage.getMessageType());
 
-        HeartsService heartsService = getGameService(gameId);
+        HeartsService heartsService = (HeartsService) getGameService(gameId);
         HeartsGameState currGameSate = (HeartsGameState) heartsService.getGameState();
 
         // TODO: Not sure if this is the ideal way to validate a user, username in header can be faked.
@@ -154,16 +154,6 @@ public class HeartsController extends GameController {
         }
 
         throw new IllegalAccessException("It is not the turn of player " + username);
-    }
-
-    /**
-     * Get a list of active games being  managed by this controller
-     *
-     * @return List of GameService objects being managed by the controller
-     */
-    @Override
-    public List<GameService> getActiveGames() {
-        return new ArrayList<>(gameRooms.values());
     }
 
     /*
@@ -203,7 +193,7 @@ public class HeartsController extends GameController {
     public ActivePlayersMessage getActivePlayers(
             @DestinationVariable int gameId
     ) {
-        HeartsService gameService = (HeartsService) gameRooms.get(gameId);
+        GameService gameService = gameRooms.get(gameId);
         return new ActivePlayersMessage(
                 gameService.getPlayers().stream()
                         .map(Player::getPlayerDescriptor)
@@ -219,21 +209,6 @@ public class HeartsController extends GameController {
     public GameUpdateMessage getGameState(@DestinationVariable int gameId){
         System.out.println("Sending out updated game state for game " + gameId);
         return new GameUpdateMessage(gameRooms.get(gameId).getGameState());
-    }
-
-    /**
-     * Get the HeartsService associated with a given gameId. Each GameState has a separate
-     * GameService object to manage it
-     *
-     * @param gameId game identification value
-     * @return The HeartsService object associated with the given ID
-     */
-    public HeartsService getGameService(int gameId){
-        HeartsService gameService = (HeartsService) gameRooms.get(gameId);
-        if (gameService == null) {
-            throw new IllegalArgumentException("Game ID " + gameId + " does not exist.");
-        }
-        return gameService;
     }
 
     @MessageExceptionHandler
