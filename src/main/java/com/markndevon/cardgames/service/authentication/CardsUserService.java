@@ -27,7 +27,12 @@ public class CardsUserService {
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
+    public static final String LOGIN_FAILURE = "Login failed";
+
     public CardGameUser register(CardGameUser user) {
+        if(repo.findByUsername(user.getUsername()) != null){
+            throw new IllegalArgumentException("User with that username is already registered");
+        }
         logger.log("Registering user: " + user.toString());
         user.setPassword(encoder.encode(user.getPassword()));
         return repo.save(user);
@@ -41,6 +46,6 @@ public class CardsUserService {
         if(authentication.isAuthenticated()){
             return jwtService.generateJWTToken(user.getUsername(), user.getPassword());
         }
-        return "Login failed";
+        return LOGIN_FAILURE;
     }
 }
