@@ -57,8 +57,9 @@ public class HeartsController extends GameController {
                                        @Header("username") String username) {
         logger.log("Creating game with ID " + gameId);
         logger.log("username for user is:  " + username);
-        HeartsService heartsService = (HeartsService) gameServiceFactory.createGameService(HEARTS, gameId, heartsRulesConfig);
-        heartsService.addPlayer(new HumanPlayer(username, 0)); // Just assigning id 0 is okay here since it's the first player
+        HumanPlayer gameOwner = new HumanPlayer(username, 0);
+        HeartsService heartsService = (HeartsService) gameServiceFactory.createGameService(HEARTS, gameId, heartsRulesConfig, gameOwner);
+        heartsService.addPlayer(gameOwner); // Just assigning id 0 is okay here since it's the first player
         gameRooms.put(gameId, heartsService);
 
         return new StartGameRequest(heartsRulesConfig);
@@ -175,7 +176,7 @@ public class HeartsController extends GameController {
      *
      * @param gameId game identification value
      * @param chatMessage message detailing the message contents and the message sender
-     * @return
+     * @return A chat message containing the chat to broadcast to all clients in the gameroom
      */
     @MessageMapping("/hearts/game-room/{gameId}/chat")
     public ChatMessage chatMessage(

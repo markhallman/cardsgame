@@ -21,8 +21,8 @@ public class HeartsService extends GameService {
     @JsonIgnore
     private final static long CPU_TURN_SLEEP_TIME = 1000L;
 
-    public HeartsService(int gameId, HeartsRulesConfig rulesConfig, SimpMessagingTemplate clientMessenger, Logger logger){
-        super(gameId, rulesConfig);
+    public HeartsService(int gameId, HeartsRulesConfig rulesConfig, HumanPlayer gameOwner, SimpMessagingTemplate clientMessenger, Logger logger){
+        super(gameId, rulesConfig, gameOwner);
         this.clientMessenger = clientMessenger;
         this.logger = logger;
     }

@@ -3,6 +3,7 @@ package com.markndevon.cardgames.service;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.markndevon.cardgames.model.config.RulesConfig;
 import com.markndevon.cardgames.model.gamestates.GameState;
+import com.markndevon.cardgames.model.player.HumanPlayer;
 import com.markndevon.cardgames.model.player.Player;
 import com.markndevon.cardgames.model.player.RandomAIPlayer;
 
@@ -14,13 +15,16 @@ public abstract class GameService {
     protected RulesConfig rulesConfig;
     protected final List<Player> players = new ArrayList<>();
 
+    protected final HumanPlayer gameOwner;
+
     protected boolean gameIsStarted = false;
     @JsonIgnore
     GameState gameState;
 
-    public GameService(int gameId, RulesConfig rulesConfig){
+    public GameService(int gameId, RulesConfig rulesConfig, HumanPlayer gameOwner){
         this.gameId = gameId;
         this.rulesConfig = rulesConfig;
+        this.gameOwner = gameOwner;
 
     }
     public int getGameId() {
