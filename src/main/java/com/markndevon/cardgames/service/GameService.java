@@ -27,6 +27,7 @@ public abstract class GameService {
         this.gameOwner = gameOwner;
 
     }
+
     public int getGameId() {
         return gameId;
     }
@@ -48,6 +49,12 @@ public abstract class GameService {
     }
 
     public boolean getGameIsStarted(){return gameIsStarted; }
+
+    public HumanPlayer getGameOwner(){return gameOwner; }
+
+    public boolean isGameOwner(Player player){
+        return player.equals(gameOwner);
+    }
 
     public boolean gameIsFull() {
         // This will be true if there are more than the max number of players,
@@ -105,8 +112,9 @@ public abstract class GameService {
         }
 
         GameService service = (GameService) obj;
-
         // The game ID should be assigned uniquely to the service, so this should be a marker of identity
-        return this.getGameId() == ((GameService) obj).getGameId();
+        return this.getGameId() == service.getGameId();
     }
+
+
 }

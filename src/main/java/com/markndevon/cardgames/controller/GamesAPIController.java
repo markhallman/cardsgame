@@ -81,7 +81,8 @@ public class GamesAPIController {
      * @return PlayerJoinedMessage with the descriptor of the player joining and the game identification value
      */
     @PostMapping("/games/joingame/{gameId}")
-    public ResponseEntity<LobbyUpdateMessage> joinGame(@PathVariable int gameId, @RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<LobbyUpdateMessage> joinGame(@PathVariable int gameId,
+                                                       @RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
         String username = jwtService.extractUsername(token);
 
@@ -118,7 +119,7 @@ public class GamesAPIController {
 
     @GetMapping("/games/authenticated/{gameId}")
     public ResponseEntity<Boolean> userIsGameMember(@PathVariable int gameId,
-                                                @RequestHeader("Authorization") String authHeader){
+                                                    @RequestHeader("Authorization") String authHeader){
         String token = authHeader.replace("Bearer ", "");
         String username = jwtService.extractUsername(token);
         GameService heartsService = HEARTS_CONTROLLER.getGameService(gameId);
