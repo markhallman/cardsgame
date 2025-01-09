@@ -218,6 +218,4 @@ public class HeartsController extends GameController {
         // ...
         //return appError;
     }
-
-
 }

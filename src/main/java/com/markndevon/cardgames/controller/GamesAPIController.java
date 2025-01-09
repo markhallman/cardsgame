@@ -1,6 +1,8 @@
 package com.markndevon.cardgames.controller;
 
+import com.markndevon.cardgames.logger.Logger;
 import com.markndevon.cardgames.message.*;
+import com.markndevon.cardgames.model.Card;
 import com.markndevon.cardgames.model.config.HeartsRulesConfig;
 import com.markndevon.cardgames.model.config.RulesConfig;
 import com.markndevon.cardgames.model.player.Player;
@@ -8,12 +10,17 @@ import com.markndevon.cardgames.service.GameService;
 import com.markndevon.cardgames.service.HeartsService;
 import com.markndevon.cardgames.service.authentication.JWTService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.imageio.ImageIO;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -30,6 +37,9 @@ public class GamesAPIController {
 
     @Autowired
     private JWTService jwtService;
+
+    @Autowired
+    private Logger logger;
 
     // TODO: initial value should be grabbed from database (we need to add game state persistence to DB)
     // TODO: active games details should be stored in a database so we can retrieve them even if service crashes
@@ -135,5 +145,35 @@ public class GamesAPIController {
 
         boolean gameIsStarted = HEARTS_CONTROLLER.getGameService(gameId).getGameIsStarted();
         return ResponseEntity.ok(gameIsStarted);
+    }
+
+
+    /**
+     * Return a card image to the client based on the input
+     *
+     * @param deck This corresponds to the deck to use for display
+     * @param card Card object that contains the actual rank and suit to be displayed
+     * @return Response entity containing the image (or not)
+     */
+    @GetMapping("/games/images/card/{cardId}/{value}")
+    public ResponseEntity<byte[]> getCardImage(@PathVariable String deck, @PathVariable Card card) {
+        try(ByteArrayOutputStream baos = new ByteArrayOutputStream()){
+            ImageIO.write(card.getImage(), "png", baos);
+            byte[] serializedCard = baos.toByteArray();
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.IMAGE_PNG)
+                    .body(serializedCard);
+        } catch(IOException ex) {
+            logger.error("Error writing card image out to byte stream", ex);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(null);
+        } catch(Exception ex) {
+            logger.error("Unexpected error returning image", ex);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(null);
+        }
     }
 }

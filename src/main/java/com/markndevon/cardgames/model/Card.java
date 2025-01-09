@@ -5,6 +5,7 @@ import com.markndevon.cardgames.model.util.Randomizer;
 import com.markndevon.cardgames.model.util.ResourceManager;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,10 +48,10 @@ public class Card {
     private final Suit suit;
     private final Value value;
     @JsonIgnore
-    private final Image image;
+    private final BufferedImage image;
 
     @JsonIgnore
-    private final Image rotatedImage;
+    private final BufferedImage rotatedImage;
     public Card(final Suit suit, final Value value) {
         this.suit = suit;
         this.value = value;
@@ -70,10 +71,10 @@ public class Card {
         return value.getVal();
     }
 
-    public Image getImage() {
+    public BufferedImage getImage() {
         return image;
     }
-    public Image getImage(final boolean rotate) {
+    public BufferedImage getImage(final boolean rotate) {
         return rotate ? rotatedImage : image;
     }
 

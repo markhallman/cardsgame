@@ -20,4 +20,11 @@ public class Logger {
             System.out.println(log);
         }
     }
+
+    public void error(final String log, final Exception exception){
+        if(DEBUG) {
+            System.out.println(log);
+            System.out.println(exception.getMessage());
+        }
+    }
 }

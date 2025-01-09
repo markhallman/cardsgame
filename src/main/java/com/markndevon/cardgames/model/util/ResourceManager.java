@@ -4,6 +4,7 @@ import com.markndevon.cardgames.model.Card;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Objects;
 
@@ -18,22 +19,22 @@ public class ResourceManager {
     private static final String PLAYER_AVATAR_IMAGE_DIR = "/static/images/icons/";
 
     private static final String ICON_DIRECTORY = "/static/images/icons/";
-    private static final Image CARD_BACK_IMAGE = readImageTryCatch(CARDS_IMAGE_DIR + DEFAULT_CARD_BACK);
+    private static final BufferedImage CARD_BACK_IMAGE = readImageTryCatch(CARDS_IMAGE_DIR + DEFAULT_CARD_BACK);
 
-    public static Image getScoreboardButtonImage(){ return readImageTryCatch(getScoreboardButtonUrl()); }
-    public static Image getRulesConfigButtonImage(){ return readImageTryCatch(getRulesConfigButtonUrl()); }
-    public static Image getChatButtonImage() {
+    public static BufferedImage getScoreboardButtonImage(){ return readImageTryCatch(getScoreboardButtonUrl()); }
+    public static BufferedImage getRulesConfigButtonImage(){ return readImageTryCatch(getRulesConfigButtonUrl()); }
+    public static BufferedImage getChatButtonImage() {
         return readImageTryCatch(getChatButtonURL());
     }
-    public static Image getChatButtonWithNotificationImage() {
+    public static BufferedImage getChatButtonWithNotificationImage() {
         return readImageTryCatch(getChatButtonWithNotificationURL());
     }
-    public static Image getApplicationIconImage() { return readImageTryCatch(getApplicationIconUrl()); }
-    public static Image getUserAvatarImage(String playerNumber) { return readImageTryCatch(getUserAvatarUrl(playerNumber));}
+    public static BufferedImage getApplicationIconImage() { return readImageTryCatch(getApplicationIconUrl()); }
+    public static BufferedImage getUserAvatarImage(String playerNumber) { return readImageTryCatch(getUserAvatarUrl(playerNumber));}
 
-    public static Image getAIAvatarImage() { return readImageTryCatch(getAIAvatarUrl()); }
+    public static BufferedImage getAIAvatarImage() { return readImageTryCatch(getAIAvatarUrl()); }
 
-    public static Image getArrowImage(final String arrowDirection){
+    public static BufferedImage getArrowImage(final String arrowDirection){
         if(arrowDirection.equals("LEFT")){
             return readImageTryCatch(SCOREBOARD_IMAGE_DIR + "Arrow-Left.png");
         } else if(arrowDirection.equals("RIGHT")){
@@ -42,24 +43,24 @@ public class ResourceManager {
         throw new IllegalArgumentException("arrowDirection must be specified to be either RIGHT or LEFT");
     }
 
-    public static Image getCardImage(final Card card) {
+    public static BufferedImage getCardImage(final Card card) {
         return getCardImage(card, false);
     }
 
-    public static Image getCardImage(final Card card, final boolean rotate) {
+    public static BufferedImage getCardImage(final Card card, final boolean rotate) {
         return getCardImage(getCardUrl(card, rotate));
     }
 
-    public static Image getCardImage(final String file) {
+    public static BufferedImage getCardImage(final String file) {
         return readImageTryCatch(file);
     }
 
-    public static Image getCardBackImage() {
+    public static BufferedImage getCardBackImage() {
         return CARD_BACK_IMAGE;
     }
 
 
-    private static Image readImageTryCatch(final String file) {
+    private static BufferedImage readImageTryCatch(final String file) {
         try {
             System.out.println(file);
             return ImageIO.read(Objects.requireNonNull(ResourceManager.class.getResourceAsStream(file)));
