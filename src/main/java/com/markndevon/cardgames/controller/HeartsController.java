@@ -9,11 +9,14 @@ import com.markndevon.cardgames.model.player.Player;
 import com.markndevon.cardgames.service.GameService;
 import com.markndevon.cardgames.service.GameServiceFactory;
 import com.markndevon.cardgames.service.HeartsService;
+import com.markndevon.cardgames.websocket.security.JwtHandshakeInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.*;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,6 +25,9 @@ import static com.markndevon.cardgames.model.gamestates.GameType.HEARTS;
 
 /**
  * Controller class for a game of hearts
+ *
+ * Methods that should be called while in lobby have the game-lobby prefix for the message mapping while methods
+ * that should be called after the game is started (or as it is starting) have the game-room prefix
  *
  * //TODO: We should move whatever we can to the parent GameController class so logic can be reused
  */
@@ -41,6 +47,14 @@ public class HeartsController extends GameController {
         this.gameServiceFactory = gameServiceFactory;
     }
 
+    private String getUsernameFromHeader(SimpMessageHeaderAccessor header){
+        String username = (String) header.getSessionAttributes().get(JwtHandshakeInterceptor.USERNAME_ATTRIBUTE);
+        if(username == null){
+            throw new IllegalStateException("Header must contain a username, should have been added in handshake");
+        }
+        return username;
+    }
+
     /**
      * This method is called by the controller when a client submits a REST API reuest to start a game
      * return value is broadcasted to all listening clients
@@ -51,16 +65,19 @@ public class HeartsController extends GameController {
      * @return StartGameRequest containing the initial set of rules the game was created with. Subject to change
      */
     @Override
-    @SendTo("/topic/hearts/game-room")
     public StartGameRequest createGame(int gameId,
                                        RulesConfig heartsRulesConfig,
-                                       @Header("username") String username) {
+                                       String username) {
         logger.log("Creating game with ID " + gameId);
         logger.log("username for user is:  " + username);
         HumanPlayer gameOwner = new HumanPlayer(username, 0);
         HeartsService heartsService = (HeartsService) gameServiceFactory.createGameService(HEARTS, gameId, heartsRulesConfig, gameOwner);
         heartsService.addPlayer(gameOwner); // Just assigning id 0 is okay here since it's the first player
         gameRooms.put(gameId, heartsService);
+
+        StartGameRequest startGameRequest = new StartGameRequest(heartsRulesConfig);
+
+        clientMessenger.convertAndSend("/topic/hearts/game-create/" + gameId, startGameRequest);
 
         return new StartGameRequest(heartsRulesConfig);
     }
@@ -72,9 +89,11 @@ public class HeartsController extends GameController {
      * @param gameId game identification value
      * @return GameStartMessage indicating the rules for the game and a list of players participating
      */
-    @MessageMapping("/hearts/game-room/{gameId}/startGame")
-    public GameStartMessage startGame(@DestinationVariable int gameId) {
-        logger.log("Starting game with ID " + gameId);
+    @MessageMapping("/hearts/game-lobby/{gameId}/startGame")
+    public GameStartMessage startGame(@DestinationVariable int gameId, SimpMessageHeaderAccessor header) {
+        String username = getUsernameFromHeader(header);
+
+        logger.log("User " + username + " Starting game with ID " + gameId);
         HeartsService heartsService = (HeartsService) getGameService(gameId);
         heartsService.startGame();
         return new GameStartMessage(heartsService.getRulesConfig(),
@@ -93,7 +112,7 @@ public class HeartsController extends GameController {
      */
     @Override
     public LobbyUpdateMessage joinGame(@DestinationVariable int gameId,
-                                        @Payload Player.PlayerDescriptor playerJoined) {
+                                       @Payload Player.PlayerDescriptor playerJoined) {
         Player playerToAdd = new HumanPlayer(playerJoined);
         HeartsService heartsService = (HeartsService) getGameService(gameId);
         heartsService.addPlayer(playerToAdd);
@@ -121,8 +140,9 @@ public class HeartsController extends GameController {
     }
 
     @Override
-    @MessageMapping("/hearts/game-room/{gameId}/updateRules")
-    public LobbyUpdateMessage updateRules(int gameId, RulesConfig rulesConfig) {
+    @MessageMapping("/hearts/game-lobby/{gameId}/updateRules")
+    public LobbyUpdateMessage updateRules(@DestinationVariable int gameId,
+                                          @Payload RulesConfig rulesConfig) {
         HeartsService heartsService = (HeartsService) getGameService(gameId);
         heartsService.setRulesConfig(rulesConfig);
 
@@ -141,13 +161,13 @@ public class HeartsController extends GameController {
     public GameUpdateMessage playCard(
             @DestinationVariable int gameId,
             @Payload PlayCardMessage cardMessage,
-            @Header("user-name") String username) throws IllegalAccessException {
+            SimpMessageHeaderAccessor header) throws IllegalAccessException {
+        String username = getUsernameFromHeader(header);
         logger.log("PlayCard message received for game " + gameId + " from player " + username + " with card " + cardMessage.getCard());
 
         HeartsService heartsService = (HeartsService) getGameService(gameId);
         HeartsGameState currGameSate = (HeartsGameState) heartsService.getGameState();
 
-        // TODO: Not sure if this is the ideal way to validate a user, username in header can be faked.
         if (currGameSate.getCurrentPlayer().getName().equals(username)) {
             heartsService.playCard(cardMessage);
             return new GameUpdateMessage(heartsService.getGameState());

@@ -78,12 +78,6 @@ public class GamesAPIController {
         return gameID;
     }
 
-    @PostMapping("games/startgame/{gameId}")
-    public GameStartMessage startGame(@PathVariable int gameId){
-        // TODO Do some user authentication to make sure this user is allowed to start this game
-        return HEARTS_CONTROLLER.startGame(gameId);
-    }
-
     /**
      * Method called by a client joining a new game
      *

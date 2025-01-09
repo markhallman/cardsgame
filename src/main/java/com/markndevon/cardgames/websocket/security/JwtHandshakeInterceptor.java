@@ -17,6 +17,8 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
     private final JWTService jwtService;
     private final CardsUserDetailsService userDetailsService;
 
+    public static final String USERNAME_ATTRIBUTE = "username";
+
     public JwtHandshakeInterceptor(JWTService jwtService, CardsUserDetailsService userDetailsService) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
@@ -36,7 +38,7 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
 
             if (username != null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                attributes.put("username", username);
+                attributes.put(USERNAME_ATTRIBUTE, username);
                 return jwtService.validateToken(token, userDetails);
             }
         }

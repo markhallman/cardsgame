@@ -5,7 +5,9 @@ import com.markndevon.cardgames.model.config.RulesConfig;
 import com.markndevon.cardgames.model.player.Player;
 import com.markndevon.cardgames.service.GameService;
 import com.markndevon.cardgames.service.HeartsService;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,8 +24,8 @@ public abstract class GameController {
     public abstract LobbyUpdateMessage joinGame(int gameId, Player.PlayerDescriptor player);
     public abstract LobbyUpdateMessage leaveGame(int gameId, Player.PlayerDescriptor player);
     public abstract LobbyUpdateMessage updateRules(int gameId, RulesConfig rulesConfig);
-    public abstract GameStartMessage startGame(int gameId);
-    public abstract GameUpdateMessage playCard(int gameId, PlayCardMessage cardMessage, String username) throws IllegalAccessException;
+    public abstract GameStartMessage startGame(int gameId, SimpMessageHeaderAccessor header);
+    public abstract GameUpdateMessage playCard(int gameId, PlayCardMessage cardMessage, SimpMessageHeaderAccessor header) throws IllegalAccessException;
 
     /**
      * Get the HeartsService associated with a given gameId. Each GameState has a separate
