@@ -6,10 +6,12 @@ import com.markndevon.cardgames.model.Card;
 import com.markndevon.cardgames.model.config.HeartsRulesConfig;
 import com.markndevon.cardgames.model.config.RulesConfig;
 import com.markndevon.cardgames.model.player.Player;
+import com.markndevon.cardgames.model.util.ResourceManager;
 import com.markndevon.cardgames.service.GameService;
 import com.markndevon.cardgames.service.HeartsService;
 import com.markndevon.cardgames.service.authentication.JWTService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -142,17 +145,9 @@ public class GamesAPIController {
     }
 
 
-    /**
-     * Return a card image to the client based on the input
-     *
-     * @param deck This corresponds to the deck to use for display
-     * @param card Card object that contains the actual rank and suit to be displayed
-     * @return Response entity containing the image (or not)
-     */
-    @GetMapping("/games/images/card/{cardId}/{value}")
-    public ResponseEntity<byte[]> getCardImage(@PathVariable String deck, @PathVariable Card card) {
+    private ResponseEntity<byte[]> serializeImageAndReturn(BufferedImage image){
         try(ByteArrayOutputStream baos = new ByteArrayOutputStream()){
-            ImageIO.write(card.getImage(), "png", baos);
+            ImageIO.write(image, "png", baos);
             byte[] serializedCard = baos.toByteArray();
 
             return ResponseEntity.ok()
@@ -169,5 +164,37 @@ public class GamesAPIController {
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(null);
         }
+    }
+
+    /**
+     * Return a card image to the client based on the input
+     *
+     * @param deck This corresponds to the deck to use for display
+     * @param suit of the card to display
+     * @param rank of the card to display
+     * @return Response entity containing the image (or not)
+     */
+    @GetMapping("/games/images/card/{deck}/{suit}/{rank}")
+    public ResponseEntity<byte[]> getCardImage(@PathVariable String deck,
+                                               @PathVariable String suit,
+                                               @PathVariable String rank) {
+        if(rank.equalsIgnoreCase("back")){
+            return serializeImageAndReturn(ResourceManager.getCardBackImage());
+        } else {
+            // TODO: implement different decks. May want a different resource management system for this task
+            Card card = new Card(Card.Suit.valueOf(suit), Card.Value.valueOf(rank));
+            return serializeImageAndReturn(card.getImage());
+        }
+    }
+
+    /**
+     * Return a player icon image based to the client
+     *
+     * @param icon string representing the icon to return
+     * @return Response entity containing the image (or not)
+     */
+    @GetMapping("/games/images/playerIcon/{icon}")
+    public ResponseEntity<byte[]> getPlayerIcon(@PathVariable String icon){
+        return serializeImageAndReturn(ResourceManager.getUserAvatarImage(icon));
     }
 }

@@ -18,12 +18,14 @@ public class WebSocketHandlerService {
 
     public void scheduleRemoval(String username) {
         // Schedule the task and store the ScheduledFuture
-        ScheduledFuture<?> scheduledTask = scheduler.schedule(() -> {
-            disconnectTasks.remove(username); // Remove the task reference after execution
-            heartsController.kickUser(username);
-        }, RECONNECT_WINDOW_SECONDS, TimeUnit.SECONDS);
+        if(!disconnectTasks.containsKey(username)){
+            ScheduledFuture<?> scheduledTask = scheduler.schedule(() -> {
+                disconnectTasks.remove(username); // Remove the task reference after execution
+                heartsController.kickUser(username);
+            }, RECONNECT_WINDOW_SECONDS, TimeUnit.SECONDS);
 
-        disconnectTasks.put(username, scheduledTask);
+            disconnectTasks.put(username, scheduledTask);
+        }
     }
 
     public void cancelRemoval(String username) {
@@ -31,6 +33,7 @@ public class WebSocketHandlerService {
         ScheduledFuture<?> scheduledTask = disconnectTasks.remove(username);
         if (scheduledTask != null) {
             scheduledTask.cancel(false); // Cancel without interrupting if already running
+            System.out.println("Kick task is cancelled: " + scheduledTask.isCancelled());
         }
     }
 

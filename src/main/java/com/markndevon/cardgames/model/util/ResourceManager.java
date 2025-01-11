@@ -62,7 +62,6 @@ public class ResourceManager {
 
     private static BufferedImage readImageTryCatch(final String file) {
         try {
-            System.out.println(file);
             return ImageIO.read(Objects.requireNonNull(ResourceManager.class.getResourceAsStream(file)));
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -93,6 +92,11 @@ public class ResourceManager {
             case "2","two","Two" -> playerAvatarUrl = PLAYER_AVATAR_IMAGE_DIR + "playerTwo.png";
             case "3","three","Three" -> playerAvatarUrl = PLAYER_AVATAR_IMAGE_DIR + "playerThree.png";
             case "4","four","Four" -> playerAvatarUrl = PLAYER_AVATAR_IMAGE_DIR + "playerFour.png";
+            case "banana", "Banana" -> playerAvatarUrl = PLAYER_AVATAR_IMAGE_DIR + "BananaIcon.png";
+            case "apple", "Apple" -> playerAvatarUrl = PLAYER_AVATAR_IMAGE_DIR + "AppleIcon.png";
+            case "cherry", "Cherry" -> playerAvatarUrl = PLAYER_AVATAR_IMAGE_DIR + "CherryIcon.png";
+            case "strawberry", "Strawberry" -> playerAvatarUrl = PLAYER_AVATAR_IMAGE_DIR + "StrawberryIcon.png";
+
             default -> throw new IllegalArgumentException("NO avatar for playerNumber " + playerNumber);
         }
         return playerAvatarUrl;
