@@ -140,7 +140,14 @@ public class GamesAPIController {
     @GetMapping("/games/isStarted/{gameId}")
     public ResponseEntity<Boolean> gameIsStarted(@PathVariable int gameId){
 
-        boolean gameIsStarted = HEARTS_CONTROLLER.getGameService(gameId).getGameIsStarted();
+        boolean gameIsStarted;
+        try {
+            gameIsStarted = HEARTS_CONTROLLER.getGameService(gameId).getGameIsStarted();
+        } catch(IllegalArgumentException ex){
+            return ResponseEntity.status(422).body(false);
+        } catch(Exception ex){
+            return ResponseEntity.status(500).body(false);
+        }
         return ResponseEntity.ok(gameIsStarted);
     }
 
