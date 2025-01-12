@@ -19,6 +19,7 @@ import org.springframework.stereotype.Controller;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.markndevon.cardgames.model.gamestates.GameType.HEARTS;
@@ -48,7 +49,9 @@ public class HeartsController extends GameController {
     }
 
     private String getUsernameFromHeader(SimpMessageHeaderAccessor header){
-        String username = (String) header.getSessionAttributes().get(JwtHandshakeInterceptor.USERNAME_ATTRIBUTE);
+        Map<String, Object> sessionAttributes = header.getSessionAttributes();
+        assert sessionAttributes != null : "Username MUST be set in sessionAttributes";
+        String username = (String) sessionAttributes.get(JwtHandshakeInterceptor.USERNAME_ATTRIBUTE);
         if(username == null){
             throw new IllegalStateException("Header must contain a username, should have been added in handshake");
         }
