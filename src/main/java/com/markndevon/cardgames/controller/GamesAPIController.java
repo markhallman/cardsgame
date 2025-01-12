@@ -98,7 +98,7 @@ public class GamesAPIController {
         if(gameHasPlayer){
             GameService service = HEARTS_CONTROLLER.getGameService(gameId);
             LobbyUpdateMessage returnMessage =
-                    new LobbyUpdateMessage(service.getPlayers(), service.getRulesConfig());
+                    new LobbyUpdateMessage(service.getPlayers(), service.getRulesConfig(), service.getGameOwner());
 
             return ResponseEntity.status(403).body(returnMessage);
         }

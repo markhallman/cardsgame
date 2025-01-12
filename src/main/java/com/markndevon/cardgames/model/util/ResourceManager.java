@@ -96,6 +96,7 @@ public class ResourceManager {
             case "apple", "Apple" -> playerAvatarUrl = PLAYER_AVATAR_IMAGE_DIR + "AppleIcon.png";
             case "cherry", "Cherry" -> playerAvatarUrl = PLAYER_AVATAR_IMAGE_DIR + "CherryIcon.png";
             case "strawberry", "Strawberry" -> playerAvatarUrl = PLAYER_AVATAR_IMAGE_DIR + "StrawberryIcon.png";
+            case "AI", "ai", "Ai" -> playerAvatarUrl = PLAYER_AVATAR_IMAGE_DIR + "questionMark.png";
 
             default -> throw new IllegalArgumentException("NO avatar for playerNumber " + playerNumber);
         }

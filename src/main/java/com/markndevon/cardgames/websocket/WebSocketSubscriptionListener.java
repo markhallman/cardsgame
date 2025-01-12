@@ -102,7 +102,7 @@ public class WebSocketSubscriptionListener {
 
             logger.log("DETECTED CONNECTION TO LOBBY " + extractedLobbyId + ", BROADCASTING LOBBY STATE");
             HeartsService heartsService = (HeartsService) heartsController.getGameService(extractedLobbyId);
-            LobbyUpdateMessage currLobbyMessage = new LobbyUpdateMessage(heartsService.getPlayers(), heartsService.getRulesConfig());
+            LobbyUpdateMessage currLobbyMessage = new LobbyUpdateMessage(heartsService.getPlayers(), heartsService.getRulesConfig(), heartsService.getGameOwner());
             messagingTemplate.convertAndSend(destination, currLobbyMessage);
         }
     }

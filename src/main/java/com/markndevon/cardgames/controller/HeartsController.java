@@ -97,8 +97,13 @@ public class HeartsController extends GameController {
         String username = getUsernameFromHeader(header);
 
         logger.log("User " + username + " Starting game with ID " + gameId);
+
         HeartsService heartsService = (HeartsService) getGameService(gameId);
+        if (!username.equals(heartsService.getGameOwner().getName())){
+            return new GameStartMessage(null, null);
+        }
         heartsService.startGame();
+
         return new GameStartMessage(heartsService.getRulesConfig(),
                 heartsService.getPlayers().stream().map(Player::getPlayerDescriptor).toList().toArray(new Player.PlayerDescriptor[0]));
     }
@@ -121,11 +126,11 @@ public class HeartsController extends GameController {
         heartsService.addPlayer(playerToAdd);
 
         LobbyUpdateMessage playerAddedMessage =
-                new LobbyUpdateMessage(heartsService.getPlayers(), heartsService.getRulesConfig());
+                new LobbyUpdateMessage(heartsService.getPlayers(), heartsService.getRulesConfig(), heartsService.getGameOwner());
 
         clientMessenger.convertAndSend("/topic/hearts/game-lobby/" + gameId, playerAddedMessage);
 
-        return new LobbyUpdateMessage(heartsService.getPlayers(), heartsService.getRulesConfig());
+        return new LobbyUpdateMessage(heartsService.getPlayers(), heartsService.getRulesConfig(), heartsService.getGameOwner());
     }
 
     @Override
@@ -139,7 +144,7 @@ public class HeartsController extends GameController {
         if(heartsService.getPlayers().isEmpty()){
             gameRooms.remove(gameId);
         }
-        return new LobbyUpdateMessage(heartsService.getPlayers(), heartsService.getRulesConfig());
+        return new LobbyUpdateMessage(heartsService.getPlayers(), heartsService.getRulesConfig(), heartsService.getGameOwner());
     }
 
     @Override
@@ -149,7 +154,7 @@ public class HeartsController extends GameController {
         HeartsService heartsService = (HeartsService) getGameService(gameId);
         heartsService.setRulesConfig(rulesConfig);
 
-        return new LobbyUpdateMessage(heartsService.getPlayers(), heartsService.getRulesConfig());
+        return new LobbyUpdateMessage(heartsService.getPlayers(), heartsService.getRulesConfig(), heartsService.getGameOwner());
     }
 
     /**
