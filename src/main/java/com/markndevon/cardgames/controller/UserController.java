@@ -27,15 +27,18 @@ public class UserController {
             return ResponseEntity.status(409).body(new CardGameUser());
         }
 
-        return ResponseEntity.ok(userService.register(user));
+        return ResponseEntity.ok(returnUser);
     }
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody CardGameUser user) {
+        logger.log("user " + user.getUsername() + " logging in");
         String retValue = userService.verify(user);
         if (retValue.equals(CardsUserService.LOGIN_FAILURE)) {
+            logger.log("login failure");
             return ResponseEntity.status(401).body(retValue);
         }
+        logger.log("login success");
 
         return ResponseEntity.ok(retValue);
     }
