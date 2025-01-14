@@ -35,3 +35,7 @@ out/
 
 ### VS Code ###
 .vscode/
+
+
+#sensitive Spring info
+application-prod.properties
