@@ -13,7 +13,7 @@ public class WebConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**") // Allow all paths
-                        .allowedOrigins("http://localhost:5173") // Allow only your frontend's origin
+                        .allowedOrigins("http://localhost:5173","http://coolestcardgames.com") // Allow only your frontend's origin
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Specify HTTP methods
                         .allowedHeaders("*") // Allow any headers
                         .allowCredentials(true); // Allow credentials if necessary
