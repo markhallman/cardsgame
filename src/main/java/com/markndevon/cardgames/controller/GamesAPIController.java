@@ -39,8 +39,6 @@ public class GamesAPIController {
     @Autowired
     private HeartsController HEARTS_CONTROLLER;
 
-    private final List<GameController> GAME_CONTROLLERS = new ArrayList<>(Arrays.asList(HEARTS_CONTROLLER));
-
     @Autowired
     private JWTService jwtService;
 
@@ -119,6 +117,8 @@ public class GamesAPIController {
      */
     @GetMapping("/games/activegames")
     public ActiveGamesMessage getActiveGames() {
+        final List<GameController> GAME_CONTROLLERS = new ArrayList<>(Arrays.asList(HEARTS_CONTROLLER));
+
         return new ActiveGamesMessage(GAME_CONTROLLERS
                 .stream()
                 .flatMap(controller -> controller.getActiveGames().stream())
@@ -132,7 +132,9 @@ public class GamesAPIController {
      * @return message witht the
      */
     @GetMapping("/games/activeLobbies")
-    public ActiveGamesMessage gertActiveLobbies() {
+    public ActiveGamesMessage getActiveLobbies() {
+        final List<GameController> GAME_CONTROLLERS = new ArrayList<>(Arrays.asList(HEARTS_CONTROLLER));
+
         return new ActiveGamesMessage(GAME_CONTROLLERS
                 .stream()
                 .flatMap(controller -> controller.getActiveLobbies().stream())
