@@ -25,6 +25,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -37,6 +38,8 @@ public class GamesAPIController {
 
     @Autowired
     private HeartsController HEARTS_CONTROLLER;
+
+    private final List<GameController> GAME_CONTROLLERS = new ArrayList<>(Arrays.asList(HEARTS_CONTROLLER));
 
     @Autowired
     private JWTService jwtService;
@@ -112,15 +115,27 @@ public class GamesAPIController {
      * API method for getting a list of ALL currently active games. Goes through all the different controller beans
      * and returns each of the games they are managing
      *
-     * @return message detailing the list of currently active games
+     * @return message with list of currently active games
      */
     @GetMapping("/games/activegames")
     public ActiveGamesMessage getActiveGames() {
-        List<GameController> controllers = new ArrayList<>();
-        controllers.add(HEARTS_CONTROLLER);
-        return new ActiveGamesMessage(controllers
+        return new ActiveGamesMessage(GAME_CONTROLLERS
                 .stream()
                 .flatMap(controller -> controller.getActiveGames().stream())
+                .collect(Collectors.toList()));
+    }
+
+    /**
+     * API method for getting a list of ALL currently active Lobbies. Goes through all the different controller beans
+     * and returns lobbies for games which have been created but not started
+     *
+     * @return message witht the
+     */
+    @GetMapping("/games/activeLobbies")
+    public ActiveGamesMessage gertActiveLobbies() {
+        return new ActiveGamesMessage(GAME_CONTROLLERS
+                .stream()
+                .flatMap(controller -> controller.getActiveLobbies().stream())
                 .collect(Collectors.toList()));
     }
 
@@ -204,4 +219,15 @@ public class GamesAPIController {
     public ResponseEntity<byte[]> getPlayerIcon(@PathVariable String icon){
         return serializeImageAndReturn(ResourceManager.getUserAvatarImage(icon));
     }
+
+    /**
+     * Return the website Icon
+     *
+     * @return Response entity containing the image (or not)
+     */
+    @GetMapping("/games/images/coolestcardgames")
+    public ResponseEntity<byte[]> getSiteIcon() {
+        return serializeImageAndReturn(ResourceManager.getApplicationIconImage());
+    }
+
 }

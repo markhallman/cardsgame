@@ -43,13 +43,19 @@ public abstract class GameController {
     }
 
     /**
-     * Get a list of active games being  managed by this controller
+     * Get a list of active games being managed by this controller
      *
      * @return List of GameService objects being managed by the controller
      */
     public List<GameService> getActiveGames() {
         return new ArrayList<>(gameRooms.values());
     }
+
+
+    public List<GameService> getActiveLobbies() {
+        return getActiveGames().stream().filter(gameService -> !gameService.getGameIsStarted()).toList();
+    }
+
 
     public int getCurrentPlayerIdForGame(int gameId) {
         // TODO: synchronization issues? Might want to use a atomic integer to track id
