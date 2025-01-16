@@ -53,7 +53,11 @@ public class JwtFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
         } else {
-            logger.log("Token is invalid or user is already authenticated. Continuing");
+            if (username == null){
+                logger.log("Token is invalid, authentication failed");
+            } else {
+                logger.log("User is already authenticated, continuing");
+            }
         }
 
         filterChain.doFilter(request, response);

@@ -196,7 +196,7 @@ public class GamesAPIController {
      * @param rank of the card to display
      * @return Response entity containing the image (or not)
      */
-    @GetMapping("/games/images/card/{deck}/{suit}/{rank}")
+    @GetMapping("/images/card/{deck}/{suit}/{rank}")
     public ResponseEntity<byte[]> getCardImage(@PathVariable String deck,
                                                @PathVariable String suit,
                                                @PathVariable String rank) {
@@ -215,7 +215,7 @@ public class GamesAPIController {
      * @param icon string representing the icon to return
      * @return Response entity containing the image (or not)
      */
-    @GetMapping("/games/images/playerIcon/{icon}")
+    @GetMapping("/images/playerIcon/{icon}")
     public ResponseEntity<byte[]> getPlayerIcon(@PathVariable String icon){
         return serializeImageAndReturn(ResourceManager.getUserAvatarImage(icon));
     }
@@ -225,7 +225,7 @@ public class GamesAPIController {
      *
      * @return Response entity containing the image (or not)
      */
-    @GetMapping("/games/images/coolestcardgames")
+    @GetMapping("/images/coolestcardgames")
     public ResponseEntity<byte[]> getSiteIcon() {
         return serializeImageAndReturn(ResourceManager.getApplicationIconImage());
     }

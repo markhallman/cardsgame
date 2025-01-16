@@ -33,9 +33,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults()) // Set up CORS TODO: Finish configuration, only one domain so shouldnt need to be wide open
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("login", "register", "images", "/ws/**").permitAll() // Allow login endpoint
+                        .requestMatchers("login", "register", "/images/**", "/ws/**").permitAll() // Allow login endpoint
                         .anyRequest().authenticated()            // Secure everything
-                ).httpBasic(Customizer.withDefaults())         // Basic Auth (JWT is recommended for production)
+                ).httpBasic(Customizer.withDefaults())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
