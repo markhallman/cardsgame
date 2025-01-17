@@ -129,7 +129,7 @@ public class GamesAPIController {
      * API method for getting a list of ALL currently active Lobbies. Goes through all the different controller beans
      * and returns lobbies for games which have been created but not started
      *
-     * @return message witht the
+     * @return message with the list of currently active lobbies
      */
     @GetMapping("/games/activeLobbies")
     public ActiveGamesMessage getActiveLobbies() {
