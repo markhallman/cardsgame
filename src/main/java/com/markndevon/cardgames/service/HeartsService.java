@@ -55,6 +55,9 @@ public class HeartsService extends GameService {
             } catch (InterruptedException e) {
                 logger.error("Thread interrupted while sleeping for CPU turn", e);
             }
+
+            // TODO: Theres a question here on whether the gameState itself or the service should be accessing these
+            //  methods. I think it makes more sense in the game state itself honestly, but leaving it as is for now
             ((HeartsGameState)getGameState()).possiblyResolveTrick();
             ((HeartsGameState)getGameState()).possiblyResolveHand();
             updateClients(); // Should send an updated game state after hand/trick resolution as well
