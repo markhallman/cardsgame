@@ -188,7 +188,11 @@ public class HeartsGameState extends GameState {
 
         logger.log("Player " + currentPlayer + " played card " + card);
 
-        currentPlayer = players[(currentPlayer.getId() + 1) % players.length];
+        // Set the current player. If this was the last card in the trick,
+        //  don't set the current player until the trick is resolved (in possiblyResolveTrick)
+        currentPlayer = currentTrick.size() == players.length ?
+                null :
+                players[(currentPlayer.getId() + 1) % players.length];
 
         dumpGameInfo();
 

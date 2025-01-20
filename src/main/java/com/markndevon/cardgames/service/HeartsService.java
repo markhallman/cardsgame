@@ -35,7 +35,11 @@ public class HeartsService extends GameService {
      */
     public void playCard(PlayCardMessage playCard){
         if(gameIsStarted){
-            HumanPlayer playingPlayer = getPlayers().stream().filter(player -> player.getName().equals(playCard.getPlayerName())).map(player -> (HumanPlayer) player).findFirst().orElse(null);
+            HumanPlayer playingPlayer = getPlayers()
+                    .stream()
+                    .filter(player -> player.getName().equals(playCard.getPlayerName()))
+                    .map(player -> (HumanPlayer) player).findFirst().orElse(null);
+
             if(playingPlayer == null){
                 throw new RuntimeException("Player " + playCard.getPlayerName() + " not found in game");
             }
