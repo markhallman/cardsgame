@@ -33,7 +33,7 @@ public class HeartsService extends GameService {
      *
      * @param playCard message detailing card being played and by who
      */
-    public void playCard(PlayCardMessage playCard){
+    public synchronized void playCard(PlayCardMessage playCard){
         if(gameIsStarted){
             HumanPlayer playingPlayer = getPlayers()
                     .stream()
@@ -53,7 +53,7 @@ public class HeartsService extends GameService {
             try {
                 Thread.sleep(CPU_TURN_SLEEP_TIME);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.error("Thread interrupted while sleeping for CPU turn", e);
             }
             ((HeartsGameState)getGameState()).possiblyResolveTrick();
             ((HeartsGameState)getGameState()).possiblyResolveHand();
