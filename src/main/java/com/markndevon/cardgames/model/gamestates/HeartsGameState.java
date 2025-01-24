@@ -1,10 +1,6 @@
 package com.markndevon.cardgames.model.gamestates;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.markndevon.cardgames.logger.Logger;
-import com.markndevon.cardgames.message.PassCardsMessage;
-import com.markndevon.cardgames.message.PlayCardMessage;
 import com.markndevon.cardgames.message.UpdateScoreBoardMessage;
 import com.markndevon.cardgames.model.Card;
 import com.markndevon.cardgames.model.config.HeartsRulesConfig;
@@ -70,14 +66,6 @@ public class HeartsGameState extends GameState {
     //region getters
     public Player[] getPlayers() {
         return players;
-    }
-
-    public Player.PlayerDescriptor[] getPlayerDescriptors() {
-        return playerDescriptors;
-    }
-
-    public RulesConfig getRulesConfig() {
-        return rulesConfig;
     }
 
     public List<Card> getKitty() {
@@ -350,7 +338,7 @@ public class HeartsGameState extends GameState {
 
     private void updateScoreBoardAtHandEnd() {
         HeartsRulesConfig heartsRulesConfig = (HeartsRulesConfig) rulesConfig;
-        ((HeartsScoreboard)scoreBoard).updateScore(buildUpdateScoreMap()); // TODO: Not sure if continually casting is right here?
+        scoreBoard.updateScore(buildUpdateScoreMap()); // TODO: Not sure if continually casting is right here?
         scoreBoard.saveHandScore();
 
         //TODO: Unnecessary?
