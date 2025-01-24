@@ -46,6 +46,8 @@ public class JwtFilter extends OncePerRequestFilter {
         if(username != null && SecurityContextHolder.getContext().getAuthentication() == null){
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
+            // TODO: This seems dumb, we grab the username from the token, and load the userdetails based on that...
+            //    Then compare it to the username in the token? Its the same place!!
             if(jwtService.validateToken(token, userDetails)) {
                 UsernamePasswordAuthenticationToken authenticationToken
                         = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
@@ -53,7 +55,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
         } else {
-            if (username == null){
+            if (username == null && token == null){
                 logger.log("Token is invalid, authentication failed");
             } else {
                 logger.log("User is already authenticated, continuing");

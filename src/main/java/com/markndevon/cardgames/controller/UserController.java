@@ -4,7 +4,9 @@ import com.markndevon.cardgames.logger.Logger;
 import com.markndevon.cardgames.model.authentication.CardGameUser;
 import com.markndevon.cardgames.service.authentication.CardsUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,10 +38,16 @@ public class UserController {
         String retValue = userService.verify(user);
         if (retValue.equals(CardsUserService.LOGIN_FAILURE)) {
             logger.log("login failure");
-            return ResponseEntity.status(401).body(retValue);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(retValue);
         }
         logger.log("login success");
 
         return ResponseEntity.ok(retValue);
+    }
+
+    @GetMapping
+    public ResponseEntity<String> refresh(){
+        // TODO: Implement
+        return ResponseEntity.ok("TODO IMPLEMENT");
     }
 }

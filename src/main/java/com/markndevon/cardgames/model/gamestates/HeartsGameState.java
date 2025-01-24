@@ -1,5 +1,7 @@
 package com.markndevon.cardgames.model.gamestates;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.markndevon.cardgames.logger.Logger;
 import com.markndevon.cardgames.message.PassCardsMessage;
 import com.markndevon.cardgames.message.PlayCardMessage;
@@ -7,6 +9,7 @@ import com.markndevon.cardgames.message.UpdateScoreBoardMessage;
 import com.markndevon.cardgames.model.Card;
 import com.markndevon.cardgames.model.config.HeartsRulesConfig;
 import com.markndevon.cardgames.model.config.RulesConfig;
+import com.markndevon.cardgames.model.player.HumanPlayer;
 import com.markndevon.cardgames.model.player.Player;
 import com.markndevon.cardgames.model.scoreboard.HeartsScoreboard;
 import com.markndevon.cardgames.model.scoreboard.ScoreBoard;
@@ -21,10 +24,13 @@ import java.util.concurrent.atomic.AtomicInteger;
     State information for a game of hearts
 */
 public class HeartsGameState extends GameState {
+    //TODO: Human Player doesnt really make sense as type here
+    private static final Player PLAYER_UNDETERMINED = new HumanPlayer("__UNDETERMINED__", -1);
+
+    private Player currentPlayer;
     private final List<Card> currentTrick = new ArrayList<>();
     private final Map<Player.PlayerDescriptor, Card> currentTrickMap = new LinkedHashMap<>();
     private final List<Card> kitty = new ArrayList<>();
-    private Player currentPlayer;
     private Player lastStartingPlayer = null;
     private Player trickLeader;
     private int tricksPlayed = 0;
@@ -40,7 +46,6 @@ public class HeartsGameState extends GameState {
 
     @Autowired
     private final Logger logger;
-
 
     public HeartsGameState(Player[] players, HeartsRulesConfig rulesConfig, int gameId, Logger logger) {
         super(players, rulesConfig, gameId, logger);
@@ -87,7 +92,8 @@ public class HeartsGameState extends GameState {
         return currentTrickMap;
     }
 
-    public Player getCurrentPlayer() { return currentPlayer; }
+    public Player getCurrentPlayer() {return currentPlayer;}
+
     public int getCurrentPlayerID() {
         return currentPlayer.getId();
     }
@@ -134,6 +140,11 @@ public class HeartsGameState extends GameState {
     @Override
     public boolean isLegal(Player player, Card card) {
         final HeartsRulesConfig heartsRulesConfig = (HeartsRulesConfig) getRulesConfig();
+
+        if(!player.getHand().contains(card)){
+            return false;
+        }
+
         // checks for first card legality. See RulesConfig
         // if this is the first card played this hand:
         // - must be 2 of clubs, or not a point, or anarchy
@@ -188,10 +199,13 @@ public class HeartsGameState extends GameState {
 
         logger.log("Player " + currentPlayer + " played card " + card);
 
+        System.out.println("Current trick size: " + currentTrick.size());
+        System.out.println("players size: " + players.length);
+
         // Set the current player. If this was the last card in the trick,
         //  don't set the current player until the trick is resolved (in possiblyResolveTrick)
         currentPlayer = currentTrick.size() == players.length ?
-                null :
+                PLAYER_UNDETERMINED :
                 players[(currentPlayer.getId() + 1) % players.length];
 
         dumpGameInfo();

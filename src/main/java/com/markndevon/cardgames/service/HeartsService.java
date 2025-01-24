@@ -47,22 +47,21 @@ public class HeartsService extends GameService {
             HeartsGameState currGameState = (HeartsGameState) gameState;
 
             // TODO: Refactor some repeat code here?
-            currGameState.playCard(playingPlayer, playCard.getCard());
-            updateClients();
+            if(currGameState.playCard(playingPlayer, playCard.getCard())){
+                updateClients();
 
-            try {
-                Thread.sleep(CPU_TURN_SLEEP_TIME);
-            } catch (InterruptedException e) {
-                logger.error("Thread interrupted while sleeping for CPU turn", e);
+                try {
+                    Thread.sleep(CPU_TURN_SLEEP_TIME);
+                } catch (InterruptedException e) {
+                    logger.error("Thread interrupted while sleeping for CPU turn", e);
+                }
+
+                ((HeartsGameState)getGameState()).possiblyResolveTrick();
+                ((HeartsGameState)getGameState()).possiblyResolveHand();
+                updateClients(); // Should send an updated game state after hand/trick resolution as well
+
+                playCPUTurns();
             }
-
-            // TODO: Theres a question here on whether the gameState itself or the service should be accessing these
-            //  methods. I think it makes more sense in the game state itself honestly, but leaving it as is for now
-            ((HeartsGameState)getGameState()).possiblyResolveTrick();
-            ((HeartsGameState)getGameState()).possiblyResolveHand();
-            updateClients(); // Should send an updated game state after hand/trick resolution as well
-
-            playCPUTurns();
         } else {
             logger.log("Game not started, cannot play card");
             // TODO: error handling
@@ -99,7 +98,6 @@ public class HeartsService extends GameService {
      * Convenience method for playing CPU turns in the game
      *
      * // TODO: Some repeated code with the playCard method, should probably refactor
-     * // TODO: If the hand ends on a CPU Player, need to reset the trick
      */
     private void playCPUTurns(){
         // If the next player is a CPU, resolve their action as well
@@ -118,6 +116,7 @@ public class HeartsService extends GameService {
             // This should be controlled from the service, so the game has a chance to update before trick is resovled
             ((HeartsGameState)getGameState()).possiblyResolveTrick();
             ((HeartsGameState)getGameState()).possiblyResolveHand();
+            System.out.println("Current Player: " + ((HeartsGameState) getGameState()).getCurrentPlayer());
             updateClients(); // Should send an updated game state after hand/trick resolution as well
 
             currPlayer = ((HeartsGameState)getGameState()).getCurrentPlayer();
