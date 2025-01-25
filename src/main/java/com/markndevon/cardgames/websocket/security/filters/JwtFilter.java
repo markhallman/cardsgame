@@ -27,16 +27,19 @@ public class JwtFilter extends OncePerRequestFilter {
     @Autowired
     private Logger logger;
 
+    private static final String TOKEN_PREFIX = "Bearer ";
+    private static final String AUTH_HEADER_TAG = "Authorization";
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        String authHeader = request.getHeader("Authorization");
+        String authHeader = request.getHeader(AUTH_HEADER_TAG);
 
         String token = null;
         String username = null;
-        if(authHeader != null && authHeader.startsWith("Bearer ")){
-            token = authHeader.replace("Bearer ", "");
+        if(authHeader != null && authHeader.startsWith(TOKEN_PREFIX)){
+            token = authHeader.replace(TOKEN_PREFIX, "");
             username = jwtService.extractUsername(token);
         }
 

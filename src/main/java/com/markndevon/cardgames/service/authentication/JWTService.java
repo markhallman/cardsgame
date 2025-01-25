@@ -21,23 +21,28 @@ public class JWTService {
     //TODO: this is horrible, figure out how to store this securely
     private static final String SECRET_KEY = "37o22W51GVTUL0T953LeDj69ro52O1QZcmzZ9/6yFB8=";
     private final Key secret;
-    private static final long EXPIRATION_TIME = 864_000_000; // 10 days
+    private static final long ACCESS_EXPIRATION_TIME = 864_000_000; // 10 days
 
     public JWTService() {
         secret = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
     }
-    public String generateJWTToken(String username, String password) {
+
+    public String generateAccessJWTToken(String username){
+        return generateJWTToken(username, ACCESS_EXPIRATION_TIME);
+    }
+
+    public String generateJWTToken(String username, Long expirationTime) {
         Map<String, Object> claims = new HashMap<>();
 
         Date issuedTime = new Date(System.currentTimeMillis());
-        Date expirationTime = new Date(issuedTime.getTime() + EXPIRATION_TIME);
+        Date expirationTimeDate = new Date(issuedTime.getTime() + expirationTime);
 
         return Jwts.builder()
                 .claims()
                 .add(claims)
                 .subject(username)
                 .issuedAt(issuedTime)
-                .expiration(expirationTime)
+                .expiration(expirationTimeDate)
                 .and()
                 .signWith(secret)
                 .compact();

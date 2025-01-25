@@ -33,7 +33,7 @@ public class CardsUserService {
         if(repo.findByUsername(user.getUsername()) != null){
             throw new IllegalArgumentException("User with that username is already registered");
         }
-        logger.log("Registering user: " + user.toString());
+        logger.log("Registering user: " + user);
         user.setPassword(encoder.encode(user.getPassword()));
         return repo.save(user);
     }
@@ -44,7 +44,7 @@ public class CardsUserService {
         );
 
         if(authentication.isAuthenticated()){
-            return jwtService.generateJWTToken(user.getUsername(), user.getPassword());
+            return jwtService.generateAccessJWTToken(user.getUsername());
         }
         return LOGIN_FAILURE;
     }
