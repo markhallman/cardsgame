@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,12 +34,13 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults()) // Set up CORS TODO: Finish configuration, only one domain so shouldnt need to be wide open
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("login", "register", "/images/**", "/ws/**").permitAll() // Allow login endpoint
+                        .requestMatchers("login", "register", "/images/**", "/ws/**", "/h2-console/**").permitAll() // Allow login endpoint
                         .anyRequest().authenticated()            // Secure everything
                 ).httpBasic(Customizer.withDefaults())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .headers(HeadersConfigurer::disable); // Allow same-origin frames, useful for H2 console
         return http.build();
     }
 

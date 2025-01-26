@@ -107,10 +107,6 @@ public class WebSocketSubscriptionListener {
         }
     }
 
-    // TODO: Note to self, there should be some leniency before removing the user for both disconnects and unsubscribes
-    //      right now, if you refresh the page on the lobby or game the websocket will disconnect then reconnect
-    //      We need to give the user at least a few seconds (configurable value) to reconnect
-    //      there could just be network troubles which could cause a disconnect, and we should allow that as well
     public void handleDisconnectOrUnsubscribe(AbstractSubProtocolEvent event) {
         logger.log("WEBSOCKET DISCONNECT DETECTED");
 

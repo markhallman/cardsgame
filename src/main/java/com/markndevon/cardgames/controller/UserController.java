@@ -36,6 +36,7 @@ public class UserController {
     public ResponseEntity<String> login(@RequestBody CardGameUser user) {
         logger.log("user " + user.getUsername() + " logging in");
         String retValue = userService.verify(user);
+
         if (retValue.equals(CardsUserService.LOGIN_FAILURE)) {
             logger.log("login failure");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(retValue);
