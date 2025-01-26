@@ -54,12 +54,6 @@ public class JwtFilter extends OncePerRequestFilter {
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
-        } else {
-            if (username == null && token == null){
-                logger.log("Token is invalid, authentication failed");
-            } else {
-                logger.log("User is already authenticated, continuing");
-            }
         }
 
         filterChain.doFilter(request, response);
