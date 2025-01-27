@@ -10,6 +10,8 @@ import com.markndevon.cardgames.model.player.RandomAIPlayer;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.markndevon.cardgames.model.util.ResourceManager.PLAYER_ICON_MAP;
+
 public abstract class GameService {
     protected final int gameId;
     protected RulesConfig rulesConfig;
@@ -70,6 +72,8 @@ public abstract class GameService {
         if(gameIsFull()){
             throw new IllegalArgumentException("Game is full, can't add more players");
         }
+
+        player.setIcon(PLAYER_ICON_MAP.get(players.size()));
         players.add(player);
     }
 

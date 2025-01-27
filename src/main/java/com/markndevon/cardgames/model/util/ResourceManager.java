@@ -3,12 +3,23 @@ package com.markndevon.cardgames.model.util;
 import com.markndevon.cardgames.model.Card;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class ResourceManager {
+    public static final String DEFAULT_PLAYER_ICON = "DEFAULT";
+
+    // TODO: In the future, this will be unnecessary since players will CHOOSE Icon rather than be assigned one
+    public static final List<String> PLAYER_ICON_MAP = new ArrayList<>();
+    static {
+        PLAYER_ICON_MAP.add("cherry");
+        PLAYER_ICON_MAP.add("apple");
+        PLAYER_ICON_MAP.add("banana");
+        PLAYER_ICON_MAP.add("strawberry");
+    }
 
     private static final String DEFAULT_CARD_BACK = "yellow_back.png";
     private static final String CARDS_IMAGE_DIR = "/static/images/cards/";
@@ -96,7 +107,7 @@ public class ResourceManager {
             case "apple", "Apple" -> playerAvatarUrl = PLAYER_AVATAR_IMAGE_DIR + "AppleIcon.png";
             case "cherry", "Cherry" -> playerAvatarUrl = PLAYER_AVATAR_IMAGE_DIR + "CherryIcon.png";
             case "strawberry", "Strawberry" -> playerAvatarUrl = PLAYER_AVATAR_IMAGE_DIR + "StrawberryIcon.png";
-            case "AI", "ai", "Ai" -> playerAvatarUrl = PLAYER_AVATAR_IMAGE_DIR + "questionMark.png";
+            case DEFAULT_PLAYER_ICON, "AI", "ai", "Ai" -> playerAvatarUrl = PLAYER_AVATAR_IMAGE_DIR + "questionMark.png";
 
             default -> throw new IllegalArgumentException("NO avatar for playerNumber " + playerNumber);
         }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.markndevon.cardgames.logger.Logger;
 import com.markndevon.cardgames.model.Card;
 import com.markndevon.cardgames.model.gamestates.GameState;
+import com.markndevon.cardgames.model.util.ResourceManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,12 +12,14 @@ import java.util.List;
 import java.util.Objects;
 
 public abstract class Player {
+
     private final Logger logger = Logger.getInstance();
 
     protected final List<Card> cardsWon = new ArrayList<>();
     protected List<Card> hand;
     private final String name;
     private final int id;
+    private String playerIcon = ResourceManager.DEFAULT_PLAYER_ICON;
 
     private final boolean isHumanControlled;
 
@@ -41,6 +44,14 @@ public abstract class Player {
     }
     public List<Card> getHand() {
         return hand;
+    }
+
+    public void setIcon(final String icon){
+        this.playerIcon = icon;
+    }
+
+    public String getIcon(){
+        return this.playerIcon;
     }
 
     public boolean isHumanControlled(){
