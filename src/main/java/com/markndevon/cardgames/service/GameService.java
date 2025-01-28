@@ -72,8 +72,9 @@ public abstract class GameService {
         if(gameIsFull()){
             throw new IllegalArgumentException("Game is full, can't add more players");
         }
-
-        player.setIcon(PLAYER_ICON_MAP.get(players.size()));
+        if(player.isHumanControlled()){
+            player.setIcon(PLAYER_ICON_MAP.get(players.size()));
+        }
         players.add(player);
     }
 
