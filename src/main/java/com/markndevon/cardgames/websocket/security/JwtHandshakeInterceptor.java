@@ -5,10 +5,13 @@ import com.markndevon.cardgames.service.authentication.CardsUserDetailsService;
 import com.markndevon.cardgames.service.authentication.JWTService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
@@ -17,18 +20,11 @@ import java.util.Map;
 
 public class JwtHandshakeInterceptor implements HandshakeInterceptor {
 
-    private final JWTService jwtService;
-    private final CardsUserDetailsService userDetailsService;
-
     @Autowired
+    @Lazy
     private UserController userController;
 
     public static final String USERNAME_ATTRIBUTE = "username";
-
-    public JwtHandshakeInterceptor(JWTService jwtService, CardsUserDetailsService userDetailsService) {
-        this.jwtService = jwtService;
-        this.userDetailsService = userDetailsService;
-    }
 
     @Override
     public boolean beforeHandshake(
@@ -41,7 +37,12 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
             HttpServletRequest httpServletRequest = servletRequest.getServletRequest();
 
             // Now you can pass it to your auth check
-            if (userController.checkAuth(httpServletRequest).getStatusCode() == HttpStatus.OK){
+            ResponseEntity<?> authResponse = userController.checkAuth(httpServletRequest);
+            if (authResponse.getStatusCode() == HttpStatus.OK){
+                UserDetails userDetails = (UserDetails) authResponse.getBody();
+                assert userDetails != null;
+
+                attributes.put(USERNAME_ATTRIBUTE, userDetails.getUsername());
                 return true;
             }
         } else {
