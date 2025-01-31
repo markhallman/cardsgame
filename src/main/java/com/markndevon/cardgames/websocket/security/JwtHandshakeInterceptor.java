@@ -1,11 +1,14 @@
 package com.markndevon.cardgames.websocket.security;
 
+import com.markndevon.cardgames.controller.UserController;
 import com.markndevon.cardgames.service.authentication.CardsUserDetailsService;
 import com.markndevon.cardgames.service.authentication.JWTService;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
@@ -16,6 +19,9 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
 
     private final JWTService jwtService;
     private final CardsUserDetailsService userDetailsService;
+
+    @Autowired
+    private UserController userController;
 
     public static final String USERNAME_ATTRIBUTE = "username";
 
@@ -31,16 +37,15 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
             WebSocketHandler wsHandler,
             Map<String, Object> attributes) throws Exception {
 
-        String query = request.getURI().getQuery();
-        if (query != null && query.contains("token=")) {
-            String token = query.split("token=")[1];
-            String username = jwtService.extractUsername(token);
+        if (request instanceof ServletServerHttpRequest servletRequest) {
+            HttpServletRequest httpServletRequest = servletRequest.getServletRequest();
 
-            if (username != null) {
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                attributes.put(USERNAME_ATTRIBUTE, username);
-                return jwtService.validateToken(token, userDetails);
+            // Now you can pass it to your auth check
+            if (userController.checkAuth(httpServletRequest).getStatusCode() == HttpStatus.OK){
+                return true;
             }
+        } else {
+            throw new IllegalStateException("WebSocket handshake request is not an HTTP request");
         }
 
         response.setStatusCode(HttpStatus.UNAUTHORIZED);

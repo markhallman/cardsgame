@@ -28,6 +28,8 @@ public class CardsUserService {
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
     public static final String LOGIN_FAILURE = "Login failed";
+    public static final String LOGIN_SUCCESS = "Login success";
+    public static final String LOGOUT_SUCCESS = "Logout success";
 
     public CardGameUser register(CardGameUser user) {
         if(repo.findByUsername(user.getUsername()) != null){

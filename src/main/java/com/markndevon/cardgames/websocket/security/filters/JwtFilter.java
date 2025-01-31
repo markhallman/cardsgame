@@ -1,5 +1,6 @@
 package com.markndevon.cardgames.websocket.security.filters;
 
+import com.markndevon.cardgames.controller.UserController;
 import com.markndevon.cardgames.logger.Logger;
 import com.markndevon.cardgames.service.authentication.CardsUserDetailsService;
 import com.markndevon.cardgames.service.authentication.JWTService;
@@ -8,6 +9,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,33 +31,25 @@ public class JwtFilter extends OncePerRequestFilter {
     @Autowired
     private Logger logger;
 
-    private static final String TOKEN_PREFIX = "Bearer ";
-    private static final String AUTH_HEADER_TAG = "Authorization";
+    @Autowired
+    private UserController userController;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        String authHeader = request.getHeader(AUTH_HEADER_TAG);
 
-        String token = null;
-        String username = null;
-        if(authHeader != null && authHeader.startsWith(TOKEN_PREFIX)){
-            token = authHeader.replace(TOKEN_PREFIX, "");
-            username = jwtService.extractUsername(token);
+        UserDetails userDetails = null;
+        ResponseEntity<?> authResponse = userController.checkAuth(request);
+        if(authResponse.getStatusCode() == HttpStatus.OK){
+            userDetails = (UserDetails) authResponse.getBody();
         }
 
-        if(username != null && SecurityContextHolder.getContext().getAuthentication() == null){
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-            // TODO: This seems dumb, we grab the username from the token, and load the userdetails based on that...
-            //    Then compare it to the username in the token? Its the same place!!
-            if(jwtService.validateToken(token, userDetails)) {
-                UsernamePasswordAuthenticationToken authenticationToken
-                        = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-            }
+        if(userDetails != null && SecurityContextHolder.getContext().getAuthentication() == null){
+            UsernamePasswordAuthenticationToken authenticationToken
+                    = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         }
 
         filterChain.doFilter(request, response);
