@@ -10,6 +10,7 @@ import com.markndevon.cardgames.model.util.ResourceManager;
 import com.markndevon.cardgames.service.GameService;
 import com.markndevon.cardgames.service.HeartsService;
 import com.markndevon.cardgames.service.authentication.JWTService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.imageio.ImageIO;
@@ -44,6 +46,9 @@ public class GamesAPIController {
 
     @Autowired
     private Logger logger;
+
+    @Autowired
+    private UserController userController;
 
     // TODO: initial value should be grabbed from database (we need to add game state persistence to DB)
     // TODO: active games details should be stored in a database so we can retrieve them even if service crashes
@@ -90,9 +95,9 @@ public class GamesAPIController {
      */
     @PostMapping("/games/joingame/{gameId}")
     public ResponseEntity<LobbyUpdateMessage> joinGame(@PathVariable int gameId,
-                                                       @RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
-        String username = jwtService.extractUsername(token);
+                                                       HttpServletRequest request) {
+        UserDetails userDetails = jwtService.getUserDetailsFromRequestAndValidate(request);
+        String username = userDetails.getUsername();
 
         boolean gameHasPlayer = HEARTS_CONTROLLER.getGameService(gameId).getPlayers().stream().map(Player::getName).toList().contains(username);
 
@@ -143,9 +148,10 @@ public class GamesAPIController {
 
     @GetMapping("/games/authenticated/{gameId}")
     public ResponseEntity<Boolean> userIsGameMember(@PathVariable int gameId,
-                                                    @RequestHeader("Authorization") String authHeader){
-        String token = authHeader.replace("Bearer ", "");
-        String username = jwtService.extractUsername(token);
+                                                    HttpServletRequest request){
+        UserDetails userDetails = jwtService.getUserDetailsFromRequestAndValidate(request);
+        String username = userDetails.getUsername();
+
         GameService heartsService = HEARTS_CONTROLLER.getGameService(gameId);
 
         boolean isAuthorized =

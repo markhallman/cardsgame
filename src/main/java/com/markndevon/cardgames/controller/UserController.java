@@ -60,35 +60,31 @@ public class UserController {
 
         Cookie jwtCookie = new Cookie("jwt", possibleToken);
         jwtCookie.setHttpOnly(true);
-        jwtCookie.setSecure(true);
+        jwtCookie.setSecure(false);
         jwtCookie.setPath("/");
         jwtCookie.setMaxAge(60 * 60 * 24 * 10);
+        jwtCookie.setAttribute("SameSite", "None"); // Important for cross-origin
+
         response.addCookie(jwtCookie);
+
+        logger.log("Steting cookie: " + jwtCookie);
 
         return ResponseEntity.ok(CardsUserService.LOGIN_SUCCESS);
     }
 
     @GetMapping("/authenticated")
     public ResponseEntity<?> checkAuth(HttpServletRequest request){
+        logger.log("Checking Auth for request");
 
-        Cookie[] cookies = request.getCookies();
-        if (cookies == null) {
-            return ResponseEntity.status(401).body("Unauthorized");
+        UserDetails userDetails = jwtService.getUserDetailsFromRequestAndValidate(request);
+
+        if(userDetails == null){
+            logger.log("Unauthorizred user");
+            return ResponseEntity.status(401).body("Unauthorized user");
+        } else {
+            logger.log("User okay user");
+            return ResponseEntity.ok(userDetails);
         }
-
-        for (Cookie cookie : cookies) {
-            if ("jwt".equals(cookie.getName())) {
-                String token = cookie.getValue();
-                String username = jwtService.extractUsername(token);
-
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-                if (jwtService.validateToken(token, userDetails)) {
-                    return ResponseEntity.ok(userDetails);
-                }
-            }
-        }
-        return ResponseEntity.status(401).body("Unauthorized user");
     }
 
     @PostMapping("/logout")
@@ -96,10 +92,12 @@ public class UserController {
                                          HttpServletResponse response) {
         Cookie nullJwtCookie = new Cookie("jwt", null);
         nullJwtCookie.setHttpOnly(true);
-        nullJwtCookie.setSecure(true);
+        nullJwtCookie.setSecure(false);
         nullJwtCookie.setPath("/");
         nullJwtCookie.setMaxAge(0); // Immediately expire the cookie
         response.addCookie(nullJwtCookie);
+
+        logger.log("Nulling out cookie: " + nullJwtCookie);
 
         return ResponseEntity.ok().body(LOGOUT_SUCCESS);
     }

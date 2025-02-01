@@ -41,11 +41,14 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
+        logger.log("Applying JWT Filter");
 
         UserDetails userDetails = null;
         ResponseEntity<?> authResponse = userController.checkAuth(request);
         if(authResponse.getStatusCode() == HttpStatus.OK){
             userDetails = (UserDetails) authResponse.getBody();
+            logger.log("User is OK");
+
         }
 
         if(userDetails != null && SecurityContextHolder.getContext().getAuthentication() == null){

@@ -7,9 +7,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.KeyGenerator;
@@ -20,8 +28,12 @@ public class JWTService {
 
     //TODO: this is horrible, figure out how to store this securely
     private static final String SECRET_KEY = "37o22W51GVTUL0T953LeDj69ro52O1QZcmzZ9/6yFB8=";
+    private static final Logger log = LoggerFactory.getLogger(JWTService.class);
     private final Key secret;
     private static final long ACCESS_EXPIRATION_TIME = 864_000_000; // 10 days
+
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     public JWTService() {
         secret = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
@@ -68,8 +80,32 @@ public class JWTService {
         return extractExpiration(token).before(new Date());
     }
 
-    public boolean validateToken(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    public boolean validateToken(String token) {
+        try {
+            extractAllClaims(token);
+        } catch(JwtException invalidTokenException){
+            return false;
+        }
+        return !isTokenExpired(token);
+    }
+
+    public UserDetails getUserDetailsFromRequestAndValidate(HttpServletRequest request){
+
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            return null;
+        }
+
+        for (Cookie cookie : cookies) {
+            if ("jwt".equals(cookie.getName())) {
+                String token = cookie.getValue();
+                if(validateToken(token)){
+                    String username = extractUsername(token);
+                    return userDetailsService.loadUserByUsername(username);
+                }
+            }
+        }
+
+        return null;
     }
 }
