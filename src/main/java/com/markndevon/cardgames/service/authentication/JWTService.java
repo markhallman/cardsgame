@@ -24,7 +24,6 @@ public class JWTService {
 
     //TODO: this is horrible, figure out how to store this securely
     private static final String SECRET_KEY = "37o22W51GVTUL0T953LeDj69ro52O1QZcmzZ9/6yFB8=";
-    private static final Logger log = LoggerFactory.getLogger(JWTService.class);
     private final Key secret;
     private static final long ACCESS_EXPIRATION_TIME = 864_000_000; // 10 days
 
