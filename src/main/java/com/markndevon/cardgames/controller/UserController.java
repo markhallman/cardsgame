@@ -63,7 +63,7 @@ public class UserController {
         jwtCookie.setSecure(false);
         jwtCookie.setPath("/");
         jwtCookie.setMaxAge(60 * 60 * 24 * 10);
-        jwtCookie.setAttribute("SameSite", "None"); // Important for cross-origin
+        jwtCookie.setAttribute("SameSite", "Lax"); // Important for cross-origin
 
         response.addCookie(jwtCookie);
 
