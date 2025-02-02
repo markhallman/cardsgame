@@ -29,8 +29,6 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
-        logger.log("Applying JWT Filter");
-
         UserDetails userDetails = jwtService.getUserDetailsFromRequestAndValidate(request);
 
         if(userDetails != null && SecurityContextHolder.getContext().getAuthentication() == null){

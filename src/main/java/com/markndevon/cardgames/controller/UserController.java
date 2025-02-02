@@ -56,7 +56,7 @@ public class UserController {
 
         Cookie jwtCookie = new Cookie("jwt", possibleToken);
         jwtCookie.setHttpOnly(true);
-        jwtCookie.setSecure(false);
+        jwtCookie.setSecure(true);
         jwtCookie.setPath("/");
         jwtCookie.setMaxAge(60 * 60 * 24 * 10);
         jwtCookie.setAttribute("SameSite", "Lax"); // Important for cross-origin
@@ -88,7 +88,7 @@ public class UserController {
                                          HttpServletResponse response) {
         Cookie nullJwtCookie = new Cookie("jwt", null);
         nullJwtCookie.setHttpOnly(true);
-        nullJwtCookie.setSecure(false);
+        nullJwtCookie.setSecure(true);
         nullJwtCookie.setPath("/");
         nullJwtCookie.setMaxAge(0); // Immediately expire the cookie
         response.addCookie(nullJwtCookie);
