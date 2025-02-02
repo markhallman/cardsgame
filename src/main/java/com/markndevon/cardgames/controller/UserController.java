@@ -8,6 +8,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,6 +24,9 @@ public class UserController {
 
     @Autowired
     private CardsUserService userService;
+
+    @Value("${jwt.cookie.secure}")
+    private boolean secureCookie;
 
     @Autowired
     private final Logger logger = Logger.getInstance();
@@ -56,7 +60,7 @@ public class UserController {
 
         Cookie jwtCookie = new Cookie("jwt", possibleToken);
         jwtCookie.setHttpOnly(true);
-        jwtCookie.setSecure(true);
+        jwtCookie.setSecure(secureCookie);
         jwtCookie.setPath("/");
         jwtCookie.setMaxAge(60 * 60 * 24 * 10);
         jwtCookie.setAttribute("SameSite", "Lax"); // Important for cross-origin
@@ -88,7 +92,7 @@ public class UserController {
                                          HttpServletResponse response) {
         Cookie nullJwtCookie = new Cookie("jwt", null);
         nullJwtCookie.setHttpOnly(true);
-        nullJwtCookie.setSecure(true);
+        nullJwtCookie.setSecure(secureCookie);
         nullJwtCookie.setPath("/");
         nullJwtCookie.setMaxAge(0); // Immediately expire the cookie
         response.addCookie(nullJwtCookie);
