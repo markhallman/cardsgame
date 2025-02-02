@@ -46,9 +46,6 @@ public class GamesAPIController {
     @Autowired
     private Logger logger;
 
-    @Autowired
-    private UserController userController;
-
     // TODO: initial value should be grabbed from database (we need to add game state persistence to DB)
     // TODO: active games details should be stored in a database so we can retrieve them even if service crashes
     private static final AtomicInteger GAME_ID_CREATOR = new AtomicInteger(1000);

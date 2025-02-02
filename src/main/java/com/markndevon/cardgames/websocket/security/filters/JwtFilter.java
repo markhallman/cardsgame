@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,28 +28,15 @@ public class JwtFilter extends OncePerRequestFilter {
     private JWTService jwtService;
 
     @Autowired
-    private CardsUserDetailsService userDetailsService;
-
-    @Autowired
     private Logger logger;
 
-    @Autowired
-    @Lazy
-    private UserController userController;
-
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                    @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
         logger.log("Applying JWT Filter");
 
-        UserDetails userDetails = null;
-        ResponseEntity<?> authResponse = userController.checkAuth(request);
-        if(authResponse.getStatusCode() == HttpStatus.OK){
-            userDetails = (UserDetails) authResponse.getBody();
-            logger.log("User is OK");
-
-        }
+        UserDetails userDetails = jwtService.getUserDetailsFromRequestAndValidate(request);
 
         if(userDetails != null && SecurityContextHolder.getContext().getAuthentication() == null){
             UsernamePasswordAuthenticationToken authenticationToken

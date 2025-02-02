@@ -2,7 +2,6 @@ package com.markndevon.cardgames.controller;
 
 import com.markndevon.cardgames.logger.Logger;
 import com.markndevon.cardgames.model.authentication.CardGameUser;
-import com.markndevon.cardgames.service.authentication.CardsUserDetailsService;
 import com.markndevon.cardgames.service.authentication.CardsUserService;
 import com.markndevon.cardgames.service.authentication.JWTService;
 import jakarta.servlet.http.Cookie;
@@ -30,9 +29,6 @@ public class UserController {
 
     @Autowired
     private JWTService jwtService;
-
-    @Autowired
-    private CardsUserDetailsService userDetailsService;
 
     @PostMapping("/register")
     public ResponseEntity<CardGameUser> register(@RequestBody CardGameUser user){
