@@ -33,11 +33,12 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .logout(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults()) // Set up CORS
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("login", "register", "/images/**", "/ws/**", "/h2-console/**").permitAll() // Allow login endpoint
-                        .anyRequest().authenticated()            // Secure everything
-                ).httpBasic(AbstractHttpConfigurer::disable)
+                        .anyRequest().authenticated())  // Secure everything
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
