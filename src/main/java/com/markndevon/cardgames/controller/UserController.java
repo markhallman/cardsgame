@@ -72,6 +72,7 @@ public class UserController {
         return ResponseEntity.ok(CardsUserService.LOGIN_SUCCESS);
     }
 
+    // TODO: Kind of weird, because since this path is already protetcted it should already get blocked if user is invalid
     @GetMapping("/authenticated")
     public ResponseEntity<?> checkAuth(HttpServletRequest request){
         logger.log("Checking Auth for request");
