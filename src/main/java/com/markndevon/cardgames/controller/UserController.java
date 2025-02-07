@@ -35,12 +35,12 @@ public class UserController {
     private JWTService jwtService;
 
     @PostMapping("/register")
-    public ResponseEntity<CardGameUser> register(@RequestBody CardGameUser user){
+    public ResponseEntity<?> register(@RequestBody CardGameUser user){
         CardGameUser returnUser;
         try {
             returnUser = userService.register(user);
         } catch(IllegalArgumentException ex){
-            return ResponseEntity.status(409).body(new CardGameUser());
+            return ResponseEntity.status(409).body(ex.getMessage());
         }
 
         return ResponseEntity.ok(returnUser);

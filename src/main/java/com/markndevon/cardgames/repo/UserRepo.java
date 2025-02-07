@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserRepo extends JpaRepository<CardGameUser, Integer> {
     CardGameUser findByUsername(String username);
+    CardGameUser findByEmail(String email);
 }

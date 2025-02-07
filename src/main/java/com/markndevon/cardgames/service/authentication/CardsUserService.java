@@ -35,6 +35,11 @@ public class CardsUserService {
         if(repo.findByUsername(user.getUsername()) != null){
             throw new IllegalArgumentException("User with that username is already registered");
         }
+
+        if(repo.findByEmail(user.getEmail()) != null){
+            throw new IllegalArgumentException("User with that email is already registered");
+        }
+
         logger.log("Registering user: " + user);
         user.setPassword(encoder.encode(user.getPassword()));
         return repo.save(user);
