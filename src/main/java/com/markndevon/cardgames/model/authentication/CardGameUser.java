@@ -31,7 +31,7 @@ public class CardGameUser {
 
     public String getEmail() { return email; }
 
-    public void setEmail() { this.email = email; }
+    public void setEmail(String email) { this.email = email; }
 
     public int getId() {
         return id;
