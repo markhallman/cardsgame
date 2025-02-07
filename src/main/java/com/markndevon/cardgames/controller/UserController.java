@@ -89,6 +89,7 @@ public class UserController {
 
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@RequestBody CardGameUser user,
+                                         HttpServletRequest request,
                                          HttpServletResponse response) {
         Cookie nullJwtCookie = new Cookie("jwt", null);
         nullJwtCookie.setHttpOnly(true);
@@ -101,5 +102,4 @@ public class UserController {
 
         return ResponseEntity.ok().body(LOGOUT_SUCCESS);
     }
-
 }
